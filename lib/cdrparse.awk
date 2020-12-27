@@ -50,8 +50,14 @@ $1 != 1 {
 	# είναι μηδενικό, τότε σημαίνει ότι η κλήση δεν τελεσφόρησε και
 	# το συγκεκριμένο CDR απορρίπτεται ως άχρηστο καθώς δεν παρέχει
 	# κάποια πληροφορία που μπορεί να μας φανεί χρήσιμη.
+	#
+	# TODO
+	# Ωστόσο, παρέχεται η δυνατότητα συμπερίληψης και των κλήσεων
+	# στις οποίες δεν αποκαταστάθηκε σύνδεση. Αυτό μπορεί να γίνει
+	# θέτοντας την global μεταβλητή "cdr_unconnected" σε μη μηδενική
+	# τιμή.
 
-	if (!dateTimeConnect)
+	if ((!cdr_unconnected) && (!dateTimeConnect))
 	next
 }
 
@@ -168,26 +174,4 @@ function cdr_parse_init(		dir, nfile, tfile, f, err, i) {
 
 function cdr_isnumcol(i) {
 	return (cdr_coltype[i] == "INTEGER")
-}
-
-# Η function "cdr_ipconvert" μετατρέπει τις IP addresses από 32-bit signed
-# integers (όπως είναι γραμμένες στο CDR) σε human readable IP addresses.
-
-# TODO
-# θα πρέπει να ελεγχθεί η function. Δεν είναι σίγουρο ότι η μετατροπή γίνεται
-# με τον ορθό τρόπο.
-
-function cdr_ipconvert(x,			s, l) {
-	s = sprintf("%0X", x)
-	l = length(s)
-
-	while (l < 8) {
-		s = "0" s
-		l++
-	}
-
-	return strtonum("0x" substr(s, l - 1, 2)) "." \
-		strtonum("0x" substr(s, l - 3, 2)) "." \
-		strtonum("0x" substr(s, l - 5, 2)) "." \
-		strtonum("0x" substr(s, l - 7, 2))
 }

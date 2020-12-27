@@ -1,2 +1,4 @@
 local/*
 .*.swp
+*.so
+*.o

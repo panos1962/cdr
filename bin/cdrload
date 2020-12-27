@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+progname=$(basename $0)
+
+[ -z "${CDR_BASEDIR}" ] &&
+export CDR_BASEDIR="/var/opt/cdr"
+
+usage() {
+	echo "usage: ${progname} [-i] [-r]"
+	exit 1
+}
+
+err=
+mode=
+check=
+
+while getopts ":irc" opt
+do
+	case "${opt}" in
+	i)
+		mode="INSERT"
+		;;
+	r)
+		mode="REPLACE"
+		;;
+	c)
+		check="yes"
+		;;
+	\?)
+		echo "${progname}: -${OPTARG}: invalid option" >&2
+		err=1
+		;;
+	esac
+done
+
+[ -n "${err}" ] &&
+usage
+
+shift $(expr ${OPTIND} - 1)
+
+awkcmd="awk "
+awkcmd="${awkcmd} -v mode=${mode}"
+awkcmd="${awkcmd} -v check=${check} "
+awkcmd="${awkcmd} -l ${CDR_BASEDIR}/lib/cdrawk.so"
+awkcmd="${awkcmd} -f ${CDR_BASEDIR}/lib/cdr.awk"
+awkcmd="${awkcmd} -f ${CDR_BASEDIR}/lib/cdrparse.awk"
+awkcmd="${awkcmd} -f ${CDR_BASEDIR}/lib/cdrload.awk"
+
+eval ${awkcmd} $*
+
+exit 0

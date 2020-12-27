@@ -170,15 +170,24 @@ function cdr_isnumcol(i) {
 	return (cdr_coltype[i] == "INTEGER")
 }
 
+# Η function "cdr_ipconvert" μετατρέπει τις IP addresses από 32-bit signed
+# integers (όπως είναι γραμμένες στο CDR) σε human readable IP addresses.
+
+# TODO
+# θα πρέπει να ελεγχθεί η function. Δεν είναι σίγουρο ότι η μετατροπή γίνεται
+# με τον ορθό τρόπο.
+
 function cdr_ipconvert(x,			s, l) {
 	s = sprintf("%0X", x)
 	l = length(s)
 
-	i1 = substr(s, l - 7, 2)
-	i2 = substr(s, l - 5, 2)
-	i3 = substr(s, l - 3, 2)
-	i4 = substr(s, l - 1, 2)
+	while (l < 8) {
+		s = "0" s
+		l++
+	}
 
-	return strtonum("0x" i4) "." strtonum("0x" i3) "." \
-		strtonum("0x" i2) "." strtonum("0x" i1)
+	return strtonum("0x" substr(s, l - 1, 2)) "." \
+		strtonum("0x" substr(s, l - 3, 2)) "." \
+		strtonum("0x" substr(s, l - 5, 2)) "." \
+		strtonum("0x" substr(s, l - 7, 2))
 }

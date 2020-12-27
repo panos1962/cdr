@@ -170,18 +170,14 @@ function cdr_isnumcol(i) {
 	return (cdr_coltype[i] == "INTEGER")
 }
 
-function cdr_ipconvert(x,			s, t) {
-	s = sprintf("%X", x);
-	t = s
-	gsub(/./, "F", t)
+function cdr_ipconvert(x,			s, l) {
+	s = sprintf("%0X", x)
+	l = length(s)
 
-	s = strtonum("0x" t) - strtonum("0x" s) + 1
-	s = sprintf("%X", s)
-
-	i1 = substr(s, 1, 2)
-	i2 = substr(s, 3, 2)
-	i3 = substr(s, 5, 2)
-	i4 = substr(s, 7, 2)
+	i1 = substr(s, l - 7, 2)
+	i2 = substr(s, l - 5, 2)
+	i3 = substr(s, l - 3, 2)
+	i4 = substr(s, l - 1, 2)
 
 	return strtonum("0x" i4) "." strtonum("0x" i3) "." \
 		strtonum("0x" i2) "." strtonum("0x" i1)

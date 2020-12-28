@@ -21,7 +21,7 @@ BEGIN {
 	else
 	cdr_print()
 
-	if (NR % 1000) == 0)
+	if ((NR % 1000) == 0)
 	cdr_monitor()
 }
 

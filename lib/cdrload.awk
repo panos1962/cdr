@@ -66,8 +66,6 @@ function cdr_load(			query) {
 		return 1
 	}
 
-	spawk_commit()
-
 	if (spawk_affected == 1)
 	cdr_inserted++
 

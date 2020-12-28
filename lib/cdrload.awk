@@ -3,9 +3,12 @@
 BEGIN {
 	OFS = " "
 	spawk_verbose = 0
+
 	spawk_sesami["dbname"] = "cucm"
 	spawk_sesami["dbuser"] = "cucmadm"
-	spawk_sesami["dbpassword"] = "xxx"
+
+	spawk_sesami["dbpassword"] = (ENVIRON["CDR_DBPASS"] ? \
+		ENVIRON["CDR_DBPASS"] : "xxx")
 }
 
 {

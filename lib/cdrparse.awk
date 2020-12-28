@@ -69,7 +69,7 @@ function unaccepted_columns_count() {
 	if (NF == cdr_colcount)
 	return 0
 
-	if (cdr_colcount == 94)
+	if (NF == 94)
 	return 0
 
 	return cdr_error($0 ": syntax error")

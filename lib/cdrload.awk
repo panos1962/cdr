@@ -69,7 +69,7 @@ function cdr_load(			query) {
 	if (spawk_affected == 1)
 	cdr_inserted++
 
-	else
+	else if (spawk_affected == 2)
 	cdr_updated++
 
 	return 0

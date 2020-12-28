@@ -21,7 +21,7 @@ BEGIN {
 	else
 	cdr_print()
 
-	if (monitor && ((NR % 1000) == 0))
+	if (NR % 1000) == 0)
 	cdr_monitor()
 }
 
@@ -76,6 +76,9 @@ function cdr_load(			query) {
 }
 
 function cdr_monitor() {
+	if (!monitor)
+	return
+
 	printf "%d rows inserted, %d rows updated\n", \
 		cdr_inserted, cdr_updated >"/dev/tty"
 }

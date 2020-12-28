@@ -42,8 +42,6 @@ usage
 
 shift $(expr ${OPTIND} - 1)
 
-[ -t 1 ] || monitor=
-
 awkcmd="awk "
 awkcmd="${awkcmd} -v mode=${mode}"
 awkcmd="${awkcmd} -v check=${check} "

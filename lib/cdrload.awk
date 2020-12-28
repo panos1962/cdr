@@ -1,20 +1,31 @@
+#!/usr/bin/env awk -f
+
+# Το παρόν αποτελεί την «καρδιά» του προγράμματος "cdrload" που χρησιμοποιείται
+# για την εισαγωγή των CDRs στην database. Όλες οι παράμετροι που απαιτούνται
+# για τη λειτουργία του παρόντος, περνούν ως μεταβλητές στο παρόν από το
+# πρόγραμμα "cdrload".
+#
+# Προκειμένου να λάβουν χώρα database ενέργειες INSERT ή REPLACE στην database,
+# θα πρέπει να έχει καθοριστεί το database password του χρήστη "cucmadm" στο
+# environment του προγράμματος στη enviroment variable "CDR_DBPASS", π.χ.
+#
+#	CDR_DBPASS="xxx" cdrload -i test1 test2
+
 @load "spawk"
 
 BEGIN {
 	OFS = " "
-	spawk_verbose = 0
-
-	spawk_sesami["dbname"] = "cucm"
-	spawk_sesami["dbuser"] = "cucmadm"
-
-	spawk_sesami["dbpassword"] = (ENVIRON["CDR_DBPASS"] ? \
-		ENVIRON["CDR_DBPASS"] : "xxx")
-
-	cdr_inserted = 0
-	cdr_updated = 0
 
 	if (mode) {
 		process = "cdr_load"
+
+		spawk_verbose = 0
+		spawk_sesami["dbname"] = "cucm"
+		spawk_sesami["dbuser"] = "cucmadm"
+		spawk_sesami["dbpassword"] = ENVIRON["CDR_DBPASS"]
+
+		cdr_inserted = 0
+		cdr_updated = 0
 	}
 
 	else {

@@ -50,6 +50,7 @@ usage
 shift $(expr ${OPTIND} - 1)
 
 awkcmd="awk "
+awkcmd="${awkcmd} -v cdr_progname=${progname}"
 awkcmd="${awkcmd} -v mode=${mode}"
 awkcmd="${awkcmd} -v check=${check} "
 awkcmd="${awkcmd} -v monitor=${monitor} "
@@ -58,6 +59,4 @@ awkcmd="${awkcmd} -f ${CDR_BASEDIR}/lib/cdr.awk"
 awkcmd="${awkcmd} -f ${CDR_BASEDIR}/lib/cdrparse.awk"
 awkcmd="${awkcmd} -f ${CDR_BASEDIR}/lib/cdrload.awk"
 
-eval ${awkcmd} $*
-
-exit 0
+exec ${awkcmd} $*

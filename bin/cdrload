@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# Το παρόν shell script χρησιμοποιείται για το φόρτωμα των CDRs στην database.
+# By default απλώς διαβάζει τα CDRs και εκτυπώνει τα πεδία που μας ενδιαφέρουν
+# στο standard output. Αν επιθυμούμε εισαγωγή των στοιχείων στην database, θα
+# πρέπει να χρησιμοποιήσουμε είτε την option -i (insert) είτε την option -r
+# (replace). Παρέχεται, ακόμη, και η option -m με την οποία εκτυπώνονται
+# εκτυπώνονται μηνύματα προόδου στο standard output.
+
 progname=$(basename $0)
 
 [ -z "${CDR_BASEDIR}" ] &&
@@ -18,14 +25,14 @@ monitor=
 while getopts ":cirm" opt
 do
 	case "${opt}" in
+	c)
+		check="yes"
+		;;
 	i)
 		mode="INSERT"
 		;;
 	r)
 		mode="REPLACE"
-		;;
-	c)
-		check="yes"
 		;;
 	m)
 		monitor="yes"

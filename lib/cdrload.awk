@@ -12,14 +12,19 @@ BEGIN {
 
 	cdr_inserted = 0
 	cdr_updated = 0
+
+	if (mode) {
+		process = "cdr_load"
+	}
+
+	else {
+		process = "cdr_print"
+		monitor = 0
+	}
 }
 
 {
-	if (mode)
-	cdr_load()
-
-	else
-	cdr_print()
+	@process()
 
 	if ((NR % 1000) == 0)
 	cdr_monitor()
@@ -75,15 +80,10 @@ function cdr_load(			query) {
 	return 0
 }
 
-function cdr_monitor() {
-	if (!monitor)
+function cdr_print() {
+	if (check)
 	return
 
-	printf "%d rows inserted, %d rows updated\n", \
-		cdr_inserted, cdr_updated
-}
-
-function cdr_print() {
 	printf "%s", globalCallID_callManagerId
 	printf OFS "%s", globalCallID_callId
 	printf OFS "%s", cdr_humantime(dateTimeOrigination)
@@ -99,4 +99,12 @@ function cdr_print() {
 	printf OFS "%s", cdr_s2hms(dateTimeDisconnect - dateTimeConnect)
 	printf OFS "%s", huntPilotPattern
 	print ""
+}
+
+function cdr_monitor() {
+	if (!monitor)
+	return
+
+	printf "%d rows inserted, %d rows updated\n", \
+		cdr_inserted, cdr_updated
 }

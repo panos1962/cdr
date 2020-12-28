@@ -16,12 +16,8 @@ BEGIN {
 	cdr_parse_init()
 }
 
-# Η global μεταβλητή "cdr_colcount" δείχνει το πλήθος των πεδίων που πρέπει
-# να έχει κάθε input line (129). Γραμμές που δεν έχουν το επιθυμητό πλήθος
-# πεδίων απορρίπτονται ως συντακτικά λανθασμένες.
-
-NF != cdr_colcount {
-	cdr_error($0 ": syntax error")
+{
+	if (unaccepted_columns_count())
 	next
 }
 
@@ -59,6 +55,24 @@ $1 != 1 {
 
 	if ((!cdr_unconnected) && (!dateTimeConnect))
 	next
+}
+
+# Η global μεταβλητή "cdr_colcount" δείχνει το πλήθος των πεδίων που πρέπει
+# να έχει κάθε input line (129). Γραμμές που δεν έχουν το επιθυμητό πλήθος
+# πεδίων απορρίπτονται ως συντακτικά λανθασμένες.
+#
+# TODO
+# Σε αρχεία που αφορούν στα έτη μέχρι και το 2018 υπάρχουν μόνο τα πρώτα 94
+# πεδία, επομένως πρέπει να κάνουμε δεκτές και γραμμές με 94 πεδία.
+
+function unaccepted_columns_count() {
+	if (NF == cdr_colcount)
+	return 0
+
+	if (cdr_colcount == 94)
+	return 0
+
+	return cdr_error($0 ": syntax error")
 }
 
 # Η function "cdr_fixcolvals" είναι σημαντική καθώς διαβάζει ένα προς ένα

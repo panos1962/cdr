@@ -47,10 +47,16 @@ function cdr_load(			query) {
 		spawk_escape(huntPilotPattern) \
 	")"
 
-	if (spawk_submit(query) == 2)
-	return 0
+	if (spawk_submit(query) != 2) {
+		print spawk_sqlerrno, spawk_sqlerror >"/dev/stderr"
+		return 1
+	}
 
-	print spawk_sqlerrno, spawk_sqlerror >"/dev/stderr"
+	if (spawk_affected == 1)
+	inserted++
+
+	else
+	updated++
 }
 
 function cdr_print() {

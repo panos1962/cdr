@@ -13,8 +13,9 @@ usage() {
 err=
 mode=
 check=
+monitor=
 
-while getopts ":irc" opt
+while getopts ":cirm" opt
 do
 	case "${opt}" in
 	i)
@@ -25,6 +26,9 @@ do
 		;;
 	c)
 		check="yes"
+		;;
+	m)
+		monitor="yes"
 		;;
 	\?)
 		echo "${progname}: -${OPTARG}: invalid option" >&2
@@ -38,9 +42,12 @@ usage
 
 shift $(expr ${OPTIND} - 1)
 
+[ -t 1 ] || monitor=
+
 awkcmd="awk "
 awkcmd="${awkcmd} -v mode=${mode}"
 awkcmd="${awkcmd} -v check=${check} "
+awkcmd="${awkcmd} -v monitor=${monitor} "
 awkcmd="${awkcmd} -l ${CDR_BASEDIR}/lib/cdrawk.so"
 awkcmd="${awkcmd} -f ${CDR_BASEDIR}/lib/cdr.awk"
 awkcmd="${awkcmd} -f ${CDR_BASEDIR}/lib/cdrparse.awk"

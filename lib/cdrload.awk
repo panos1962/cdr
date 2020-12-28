@@ -9,6 +9,9 @@ BEGIN {
 
 	spawk_sesami["dbpassword"] = (ENVIRON["CDR_DBPASS"] ? \
 		ENVIRON["CDR_DBPASS"] : "xxx")
+
+	cdr_inserted = 0
+	cdr_updated = 0
 }
 
 {
@@ -17,6 +20,14 @@ BEGIN {
 
 	else
 	cdr_print()
+
+	if (monitor && ((NR % 1000) == 0))
+	cdr_monitor()
+}
+
+END {
+	cdr_monitor()
+	exit(0)
 }
 
 function cdr_load(			query) {
@@ -56,10 +67,17 @@ function cdr_load(			query) {
 	}
 
 	if (spawk_affected == 1)
-	inserted++
+	cdr_inserted++
 
 	else
-	updated++
+	cdr_updated++
+
+	return 0
+}
+
+function cdr_monitor() {
+	printf "%d rows inserted, %d rows updated\n", \
+		cdr_inserted, cdr_updated >"/dev/tty"
 }
 
 function cdr_print() {

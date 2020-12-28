@@ -80,7 +80,7 @@ function cdr_monitor() {
 	return
 
 	printf "%d rows inserted, %d rows updated\n", \
-		cdr_inserted, cdr_updated >"/dev/tty"
+		cdr_inserted, cdr_updated
 }
 
 function cdr_print() {

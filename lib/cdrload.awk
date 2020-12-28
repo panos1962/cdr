@@ -2,6 +2,7 @@
 
 BEGIN {
 	OFS = " "
+	spawk_verbose = 0
 	spawk_sesami["dbname"] = "cucm"
 	spawk_sesami["dbuser"] = "cucmadm"
 	spawk_sesami["dbpassword"] = "xxx"
@@ -46,7 +47,10 @@ function cdr_load(			query) {
 		spawk_escape(huntPilotPattern) \
 	")"
 
-	print spawk_submit(query)
+	if (spawk_submit(query) == 2)
+	return 0
+
+	print spawk_sqlerrno, spawk_sqlerror >"/dev/stderr"
 }
 
 function cdr_print() {

@@ -27,5 +27,6 @@ do
 	read dbadmin </dev/tty
 done
 
-sed "s;__PASSADM__;${passadm};g
-s;__PASSINQ__;${passinq};g" "${CDR_BASEDIR}"/database/schema.sql | mysql -u "${dbadmin}" -p
+sed "/^--/d
+s/__PASSADM__/${passadm}/g
+s/__PASSINQ__/${passinq}/g" "${CDR_BASEDIR}"/database/schema.sql | mysql -u "${dbadmin}" -p

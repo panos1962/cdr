@@ -16,38 +16,48 @@
 BEGIN {
 	OFS = " "
 
-	if (mode) {
-		process = "cdr_load"
+	spawk_verbose = 0
 
-		spawk_verbose = 0
-		spawk_sesami["dbname"] = "cucm"
-		spawk_sesami["dbuser"] = "cucmadm"
-		spawk_sesami["dbpassword"] = ENVIRON["CDR_DBPASS"]
+	spawk_sesami["dbname"] = "cucm"
+	spawk_sesami["dbuser"] = "cucmadm"
+	spawk_sesami["dbpassword"] = ENVIRON["CDR_DBPASS"]
 
-		cdr_inserted = 0
-		cdr_updated = 0
-	}
+	cdr_curfile = ""
+	cdr_badfile = 1
 
-	else {
-		process = "cdr_print"
-		monitor = 0
-	}
+	cdr_totalrows = 0
+	cdr_processed = 0
+
+	process = "cdr_" (mode ? "load" : "print")
 }
 
 {
-	@process()
+	cdr_totalrows++
+	cdr_checkfile()
 
-	if ((NR % 1000) == 0)
-	cdr_monitor()
+	if (cdr_badfile)
+	next
+
+	@process()
+	cdr_processed++
+
+	if (monitor && ((cdr_processed % 1000) == 0)) {
+		printf "%d rows processed\n", cdr_processed
+		fflush()
+	}
 }
 
 END {
-	cdr_monitor()
+	if (monitor)
+	printf "%d total rows processed, %d rows skipped\n", \
+		cdr_totalrows, cdr_totalrows - cdr_processed
 	exit(0)
 }
 
-function cdr_load(			query) {
-	query = mode " INTO `cdr` (" \
+function cdr_load(mode,			a, query) {
+	query = "INSERT INTO `cdr` (" \
+		"`arxio`, " \
+		"`lineno`, " \
 		"`globalCallID_callManagerId`, " \
 		"`globalCallID_callId`, " \
 		"`dateTimeOrigination`, " \
@@ -62,6 +72,8 @@ function cdr_load(			query) {
 		"`dateTimeDisconnect`, " \
 		"`huntPilotPattern`" \
 	") VALUES (" \
+		"'" cdr_curfilemd5 "', " \
+		FNR ", " \
 		globalCallID_callManagerId ", " \
 		globalCallID_callId ", " \
 		"FROM_UNIXTIME(" dateTimeOrigination "), " \
@@ -82,13 +94,54 @@ function cdr_load(			query) {
 		return 1
 	}
 
-	if (spawk_affected == 1)
-	cdr_inserted++
-
-	else if (spawk_affected == 2)
-	cdr_updated++
-
 	return 0
+}
+
+function cdr_checkfile(			n, a) {
+	n = split(FILENAME, a, "/")
+
+	if (a[n] == cdr_curfile)
+	return
+
+	cdr_badfile = 1
+
+	cdr_curfile = a[n]
+
+	if (cdr_curfile !~ /^cdr_StandAloneCluster_0[12]_2[0-9]{11}_[0-9]+$/)
+	return cdr_error(FILENAME ": bad file name")
+
+	spawk_submit("SELECT MD5('" cdr_curfile "')")
+
+	spawk_fetchone(a)
+	cdr_curfilemd5 = a[1]
+
+	if (length(cdr_curfilemd5) != 32)
+	return cdr_error(FILENAME ": MD5 filename conversion failed")
+
+	spawk_submit("SELECT `onomasia` FROM `arxio` " \
+		"WHERE `kodikos` = '" cdr_curfilemd5 "'")
+
+	if (spawk_fetchone(a)) {
+		if (a[1] != cdr_curfile)
+		return cdr_error(FILENAME ": MD5 filename collision");
+
+		if (mode == "insert")
+		return cdr_error(cdr_curfile ": file already loaded")
+
+		if (spawk_submit("DELETE FROM `cdr` " \
+			"WHERE `arxio` = '" cdr_curfilemd5 "'") != 2)
+		return cdr_error("cannot delete CDRs for file '" cdr_curfile "'")
+	}
+
+	else {
+		if (spawk_submit("INSERT INTO `arxio` (" \
+			"`kodikos`, " \
+			"`onomasia`" \
+		") VALUES ('" cdr_curfilemd5 "', '" cdr_curfile "')") != 2)
+		return cdr_error(FILENAME ": insert file failed")
+	}
+
+	cdr_badfile = 0
 }
 
 function cdr_print() {
@@ -110,12 +163,4 @@ function cdr_print() {
 	printf OFS "%s", cdr_s2hms(dateTimeDisconnect - dateTimeConnect)
 	printf OFS "%s", huntPilotPattern
 	print ""
-}
-
-function cdr_monitor() {
-	if (!monitor)
-	return
-
-	printf "%d rows inserted, %d rows updated\n", \
-		cdr_inserted, cdr_updated
 }

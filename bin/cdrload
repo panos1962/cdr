@@ -29,10 +29,10 @@ do
 		check="yes"
 		;;
 	i)
-		mode="INSERT"
+		mode="insert"
 		;;
 	r)
-		mode="REPLACE"
+		mode="replace"
 		;;
 	m)
 		monitor="yes"

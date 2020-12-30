@@ -92,6 +92,9 @@ function cdr_checkfile(			n, a) {
 		if (dbmode == "insert")
 		return cdr_error(cdr_curfile ": file already loaded")
 
+		if (check)
+		return cdr_error(cdr_curfile ": file exists")
+
 		if (dbmode && spawk_submit("DELETE FROM `cdr` " \
 			"WHERE `arxio` = '" cdr_curfilemd5 "'") != 2)
 		return cdr_error("cannot delete CDRs for file '" cdr_curfile "'")

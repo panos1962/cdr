@@ -18,25 +18,47 @@ usage() {
 }
 
 err=
-mode=
+dbmode=
 check=
 monitor=
 
 while getopts ":cirm" opt
 do
 	case "${opt}" in
+
+	# Με την option -c το πρόγραμμα απλώς εκτυπώνει μηνύματα λάθους
+	# που αφορούν σε λανθασμένες εγγραφές. Ως λανθασμένες εγγραφές
+	# νοούνται εγγραφές που είτε δεν έχουν το σωστό format, είτε
+	# κάποια από τα πεδία έχουν μη αποδεκτές τιμές.
 	c)
 		check="yes"
 		;;
+
+	# Με την option -i οι εγγραφές εισάγονται στην database. Τυχόν
+	# εγγραφές που έχουν ήδη εισαχθεί απορρίπτονται. Ο έλεγχος για
+	# ήδη εισηγμένες εγγραφές γίνεται με βάση το όνομα του αρχείου.
+	# Τα αρχεία είτε εισάγονται ολόκληρα, είτε καθόλου.
 	i)
-		mode="insert"
+		dbmode="insert"
 		;;
+
+	# Με την option -r εισάγονται εγγραφές στην database. Εγγραφές
+	# που έχουν ήδη εισαχθεί επενεισάγονται αφού πρώτα διαγραφούν
+	# οι παλιές. Ο έλεγχος γίνεται με βάση το όνομα του αρχείου.
+	# Πιο συγκεκριμένα, για κάθε input file ελέγχεται αν υπάρχουν
+	# ήδη εγγραφές στην database και αν ναι, τότε αυτές οι εγγραφές
+	# διαγράφονται προκειμένου να εισαχθούν εκ νέου από το τρέχον
+	# αρχείο.
 	r)
-		mode="replace"
+		dbmode="replace"
 		;;
+
+	# Με την option -m εκτυπώνονται μηνύματα προόδου των εργασιών
+	# και συνολικά μηνύματα στο τέλος κάθε awk session.
 	m)
 		monitor="yes"
 		;;
+
 	\?)
 		echo "${progname}: -${OPTARG}: invalid option" >&2
 		err=1
@@ -51,7 +73,7 @@ shift $(expr ${OPTIND} - 1)
 
 awkcmd="awk "
 awkcmd="${awkcmd} -v cdr_progname=${progname}"
-awkcmd="${awkcmd} -v mode=${mode}"
+awkcmd="${awkcmd} -v dbmode=${dbmode}"
 awkcmd="${awkcmd} -v check=${check} "
 awkcmd="${awkcmd} -v monitor=${monitor} "
 awkcmd="${awkcmd} -l ${CDR_BASEDIR}/lib/cdrawk.so"

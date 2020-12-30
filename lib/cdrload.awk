@@ -26,17 +26,24 @@ BEGIN {
 	cdr_badfile = 1
 
 	cdr_totalrows = 0
+	cdr_rejected = 0
 	cdr_processed = 0
 
-	process = "cdr_" (mode ? "load" : "print")
+	process = "cdr_" (dbmode ? "dbload" : "print")
 }
 
 {
 	cdr_totalrows++
 	cdr_checkfile()
 
-	if (cdr_badfile)
-	next
+	# Αν κατά τον έλεγχο του ονόματος του αρχείου εντοπιστεί
+	# οποιοδήποτε σφάλμα, τότε τίθεται η flag "cdr_badfile"
+	# και οι εγγραφές του συγκεκριμένου αρχείου απορρίπτονται.
+
+	if (cdr_badfile) {
+		cdr_rejected++
+		next
+	}
 
 	@process()
 	cdr_processed++
@@ -54,7 +61,54 @@ END {
 	exit(0)
 }
 
-function cdr_load(mode,			a, query) {
+function cdr_checkfile(			n, a) {
+	n = split(FILENAME, a, "/")
+
+	if (a[n] == cdr_curfile)
+	return
+
+	cdr_badfile = 1
+
+	cdr_curfile = a[n]
+
+	if (cdr_curfile !~ /^cdr_StandAloneCluster_0[12]_2[0-9]{11}_[0-9]+$/)
+	return cdr_error(FILENAME ": bad file name")
+
+	spawk_submit("SELECT MD5('" cdr_curfile "')")
+
+	spawk_fetchone(a)
+	cdr_curfilemd5 = a[1]
+
+	if (length(cdr_curfilemd5) != 32)
+	return cdr_error(FILENAME ": MD5 filename conversion failed")
+
+	spawk_submit("SELECT `onomasia` FROM `arxio` " \
+		"WHERE `kodikos` = '" cdr_curfilemd5 "'")
+
+	if (spawk_fetchone(a)) {
+		if (a[1] != cdr_curfile)
+		return cdr_error(FILENAME ": MD5 filename collision");
+
+		if (dbmode == "insert")
+		return cdr_error(cdr_curfile ": file already loaded")
+
+		if (dbmode && spawk_submit("DELETE FROM `cdr` " \
+			"WHERE `arxio` = '" cdr_curfilemd5 "'") != 2)
+		return cdr_error("cannot delete CDRs for file '" cdr_curfile "'")
+	}
+
+	else if (dbmode) {
+		if (spawk_submit("INSERT INTO `arxio` (" \
+			"`kodikos`, " \
+			"`onomasia`" \
+		") VALUES ('" cdr_curfilemd5 "', '" cdr_curfile "')") != 2)
+		return cdr_error(FILENAME ": insert file failed")
+	}
+
+	cdr_badfile = 0
+}
+
+function cdr_dbload(mode,			a, query) {
 	query = "INSERT INTO `cdr` (" \
 		"`arxio`, " \
 		"`lineno`, " \
@@ -95,53 +149,6 @@ function cdr_load(mode,			a, query) {
 	}
 
 	return 0
-}
-
-function cdr_checkfile(			n, a) {
-	n = split(FILENAME, a, "/")
-
-	if (a[n] == cdr_curfile)
-	return
-
-	cdr_badfile = 1
-
-	cdr_curfile = a[n]
-
-	if (cdr_curfile !~ /^cdr_StandAloneCluster_0[12]_2[0-9]{11}_[0-9]+$/)
-	return cdr_error(FILENAME ": bad file name")
-
-	spawk_submit("SELECT MD5('" cdr_curfile "')")
-
-	spawk_fetchone(a)
-	cdr_curfilemd5 = a[1]
-
-	if (length(cdr_curfilemd5) != 32)
-	return cdr_error(FILENAME ": MD5 filename conversion failed")
-
-	spawk_submit("SELECT `onomasia` FROM `arxio` " \
-		"WHERE `kodikos` = '" cdr_curfilemd5 "'")
-
-	if (spawk_fetchone(a)) {
-		if (a[1] != cdr_curfile)
-		return cdr_error(FILENAME ": MD5 filename collision");
-
-		if (mode == "insert")
-		return cdr_error(cdr_curfile ": file already loaded")
-
-		if (spawk_submit("DELETE FROM `cdr` " \
-			"WHERE `arxio` = '" cdr_curfilemd5 "'") != 2)
-		return cdr_error("cannot delete CDRs for file '" cdr_curfile "'")
-	}
-
-	else {
-		if (spawk_submit("INSERT INTO `arxio` (" \
-			"`kodikos`, " \
-			"`onomasia`" \
-		") VALUES ('" cdr_curfilemd5 "', '" cdr_curfile "')") != 2)
-		return cdr_error(FILENAME ": insert file failed")
-	}
-
-	cdr_badfile = 0
 }
 
 function cdr_print() {

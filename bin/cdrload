@@ -13,7 +13,7 @@ progname=$(basename $0)
 export CDR_BASEDIR="/var/opt/cdr"
 
 usage() {
-	echo "usage: ${progname} [-i] [-r]"
+	echo "usage: ${progname} [-i] [-r] files..."
 	exit 1
 }
 
@@ -70,6 +70,9 @@ done
 usage
 
 shift $(expr ${OPTIND} - 1)
+
+[ $# -lt 1 ] &&
+usage
 
 awkcmd="awk "
 awkcmd="${awkcmd} -v cdr_progname=${progname}"

@@ -111,13 +111,16 @@ function cdr_checkfile(			n, a) {
 	if (a[n] == curfile)
 	return
 
+	# Θέτουμε την global μεταβλητή "curfile" στο basename του τρέχοντος
+	# input file.
+
+	curfile = a[n]
+
 	# Αρχικά θεωρούμε ότι το τρέχον input file δεν είναι αποδεκτό.
 	# Το input file θα θεωρηθεί αποδεκτό μόνο εφόσον «περάσει» τους
 	# σχετικούς ελέγχους.
 	
 	skipfile = 1
-
-	curfile = a[n]
 
 	if (curfile !~ /^cdr_StandAloneCluster_0[12]_2[0-9]{11}_[0-9]+$/)
 	return cdr_error(FILENAME ": bad file name")
@@ -158,12 +161,12 @@ function cdr_checkfile(			n, a) {
 		# θεωρήσουμε ότι πρόκειται για το ίδιο αρχείο το οποίο έχει
 		# εισαχθεί στην database σε προγενέστερο χρόνο. Σ' αυτήν την
 		# περίπτωση θα πρέπει είτε να προσπεράσουμε τα δεδομένα τού
-		# τρέχοντος input file (insert mode)
+		# τρέχοντος input file (insert mode)…
 
 		if (dbmode == "insert")
 		return cdr_error(FILENAME ": file already loaded")
 
-		# είτε να διαγράψουμε τα παλαιά CDRs από την database και
+		# …είτε να διαγράψουμε τα παλαιά CDRs από την database και
 		# να προχωρήσουμε στην εισαγωγή των νέων CDRs από το τρέχον
 		# input file.
 

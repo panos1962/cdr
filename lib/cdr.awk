@@ -68,6 +68,28 @@ function cdr_s2hms(x,		m, h, s) {
 	return x
 }
 
+function cdr_ferror(msg, stat) {
+	cdr_error()
+
+	if (FILENAME)
+	printf FILENAME ": [" FNR "]" >"/dev/stderr"
+
+	else
+	printf "[" NR "]" >"/dev/stderr"
+
+	printf ": " >"/dev/stderr"
+
+	if (!msg)
+	return 1
+
+	print msg >"/dev/stderr"
+
+	if (!stat)
+	return 1
+
+	exit(stat)
+}
+
 # Η function "cdr_error" δέχεται ως πρώτη παράμετρο ένα μήνυμα λάθους το
 # οποίο εκτυπώνει στο standard error. Αν δοθεί και δεύτερη παράμετρος,
 # αυτή θεωρείται exit status και το πρόγραμμα τερματίζεται με το συγκεκριμένο
@@ -81,8 +103,8 @@ function cdr_error(msg, stat) {
 
 	print msg >"/dev/stderr"
 
-	if (stat)
-	exit(stat)
-
+	if (!stat)
 	return 1
+
+	exit(stat)
 }

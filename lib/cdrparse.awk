@@ -1,4 +1,3 @@
-#!/usr/bin/env awk -f
 
 # Το παρόν awk script αποτελεί «βιβλιοθήκη» εργαλείων διαχείρισης των CDR
 # files του CUCM και χρησιμοποιείται όταν διαβάζουμε τα CDR files που
@@ -17,12 +16,12 @@ BEGIN {
 }
 
 {
-	if (unaccepted_columns_count())
+	if (cdr_unaccepted_columns_count())
 	next
 }
 
 # Τα CDRs έχουν στην πρώτη στήλη τον αριθμό 1, επομένως κάθε record που δεν
-# πληροί αυτή την προϋπόθεση απορρίπτεται (σιωπηρά) από το πρόγραμμα.
+# πληροί αυτή την προϋπόθεση απορρίπτεται σιωπηρά από το πρόγραμμα.
 
 $1 != 1 {
 	next
@@ -65,14 +64,14 @@ $1 != 1 {
 # Σε αρχεία που αφορούν στα έτη μέχρι και το 2018 υπάρχουν μόνο τα πρώτα 94
 # πεδία, επομένως πρέπει να κάνουμε δεκτές και γραμμές με 94 πεδία.
 
-function unaccepted_columns_count() {
+function cdr_unaccepted_columns_count() {
 	if (NF == cdr_colcount)
 	return 0
 
 	if (NF == 94)
 	return 0
 
-	return cdr_error($0 ": syntax error")
+	return cdr_ferror($0 ": syntax error")
 }
 
 # Η function "cdr_fixcolvals" είναι σημαντική καθώς διαβάζει ένα προς ένα
@@ -104,7 +103,7 @@ function cdr_fixcolvals(			i, col) {
 	# να είναι καθορισμένο.
 
 	if (dateTimeOrigination <= 0)
-	return cdr_error($0 ": invalid origination timestamp")
+	return cdr_ferror($0 ": invalid origination timestamp")
 
 	# Το ίδιο ισχύει και για το "dateTimeDisconnect" που είναι το
 	# timestamp αποσύνδεσης ή απενεργοποίησης της συσκευής. Αυτό
@@ -112,7 +111,7 @@ function cdr_fixcolvals(			i, col) {
 	# timestamp ενεργοποίησης της συσκευής.
 
 	if (dateTimeDisconnect < dateTimeOrigination)
-	return cdr_error($0 ": invalid disconnection timestamp")
+	return cdr_ferror($0 ": invalid disconnection timestamp")
 
 	# Το πεδίο "dateTimeConnect" είναι το timestamp σύνδεσης, δηλαδή
 	# της αποκατάστασης επικοινωνίας μεταξύ καλούντος και καλουμένου.
@@ -123,10 +122,10 @@ function cdr_fixcolvals(			i, col) {
 
 	if (dateTimeConnect) {
 		if (dateTimeConnect < dateTimeOrigination)
-		return cdr_error($0 ": origination/connection disorder")
+		return cdr_ferror($0 ": origination/connection disorder")
 
 		if (dateTimeConnect > dateTimeDisconnect)
-		return cdr_error($0 ": connection/disconnection disorder")
+		return cdr_ferror($0 ": connection/disconnection disorder")
 	}
 
 	# Μέχρι εδώ φαίνεται το CDR να είναι αποδεκτό και μπορούμε να

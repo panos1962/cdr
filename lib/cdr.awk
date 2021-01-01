@@ -1,10 +1,16 @@
 #!/usr/bin/env awk -f
 
 # Το παρόν awk script αποτελεί ένα είδος «βιβλιοθήκης» λειτουργιών που
-# αφορούν στη διαχείριση και στην επεξεργασία των CDRs. Εμπεριέχονται
-# στη βιβλιοθήκη και functions γενικής χρήσης, π.χ. error reporting
-# functions, convertion functions κλπ.
+# αφορούν στη διαχείριση και στην επεξεργασία των αρχείων που αποστέλλει
+# ο CUCM στον server υποδοχής· τα αρχεία αυτά είναι δύο ειδών: CDR και
+# CMR που περιέχουν Call Detail Records και Call Management Records
+# αντίστοιχα. Τόσο τα CDR όσο και τα MR files είναι CSV και εκκινούν
+# αμφότερα με δύο γραμμές metadata.
 #
+# Το ενδιαφέρον μας περιορίζεται στα αρχεία CDR, τα οποία εκκινούν με δύο
+# γραμμές metadata, ενώ το πρώτο πεδίο των υπολοίπων γραμμών έχει τιμή 1
+# σε αντίθεση με τα CMRs που έχουν τιμή 2.
+# 
 # Όλα τα global αντικείμενα της βιβλιοθήκης, συμπεριλαμβανομένων των
 # function names εκκινούν με το πρόθεμα "cdr_" προκειμένου να αποφύγουμε
 # ανεπιθύμητες διπλονομασίες. Εξαίρεση αποτελούν τα ονόματα των πεδίων
@@ -68,16 +74,13 @@ function cdr_s2hms(x,		m, h, s) {
 	return x
 }
 
-function cdr_ferror(msg, stat) {
-	cdr_error()
+# Η function "cdr_error" δέχεται ως πρώτη παράμετρο ένα μήνυμα λάθους το
+# οποίο εκτυπώνει στο standard error. Αν δοθεί και δεύτερη παράμετρος,
+# αυτή θεωρείται exit status και το πρόγραμμα τερματίζεται με το συγκεκριμένο
+# exit status.
 
-	if (FILENAME)
-	printf FILENAME ": [" FNR "]" >"/dev/stderr"
-
-	else
-	printf "[" NR "]" >"/dev/stderr"
-
-	printf ": " >"/dev/stderr"
+function cdr_error(msg, stat) {
+	printf cdr_progname ": " >"/dev/stderr"
 
 	if (!msg)
 	return 1
@@ -90,13 +93,20 @@ function cdr_ferror(msg, stat) {
 	exit(stat)
 }
 
-# Η function "cdr_error" δέχεται ως πρώτη παράμετρο ένα μήνυμα λάθους το
-# οποίο εκτυπώνει στο standard error. Αν δοθεί και δεύτερη παράμετρος,
-# αυτή θεωρείται exit status και το πρόγραμμα τερματίζεται με το συγκεκριμένο
-# exit status.
+# Η function "cdr_ferror" είναι παρόμοια με την function "cdr_error" τη
+# διαφορά ότι εκτυπώνεται επιπλέον το όνομα του τρέχοντος input file και
+# ο αρθμός τής τρέχουσας input line.
 
-function cdr_error(msg, stat) {
-	printf cdr_progname ": " >"/dev/stderr"
+function cdr_ferror(msg, stat) {
+	cdr_error()
+
+	if (FILENAME)
+	printf FILENAME ": [" FNR "]" >"/dev/stderr"
+
+	else
+	printf "[" NR "]" >"/dev/stderr"
+
+	printf ": " >"/dev/stderr"
 
 	if (!msg)
 	return 1

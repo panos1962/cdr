@@ -16,14 +16,10 @@ BEGIN {
 }
 
 {
-	if (cdr_unaccepted_columns_count())
+	if (cdr_invalid_record_type())
 	next
-}
 
-# Τα CDRs έχουν στην πρώτη στήλη τον αριθμό 1, επομένως κάθε record που δεν
-# πληροί αυτή την προϋπόθεση απορρίπτεται σιωπηρά από το πρόγραμμα.
-
-$1 != 1 {
+	if (cdr_unaccepted_columns_count())
 	next
 }
 
@@ -72,6 +68,21 @@ function cdr_unaccepted_columns_count() {
 	return 0
 
 	return cdr_ferror($0 ": syntax error")
+}
+
+# Τα CDRs έχουν στην πρώτη στήλη τον αριθμό 1, επομένως κάθε record που δεν
+# πληροί αυτή την προϋπόθεση απορρίπτεται από το πρόγραμμα. Ωστόσο, τα δύο
+# πρώτα records των CDR files αφορούν στα ονόματα και τους τύπους των πεδίων,
+# επομένως οι δύο πρώτες γραμμές κάθε input file απορρίπτονται σιωπηρά.
+
+function cdr_invalid_record_type() {
+	if ($1 == 1)
+	return 0
+
+	if (FNR < 3)
+	return 1
+
+	return cdr_ferror($0 ": invalid CDR record type")
 }
 
 # Η function "cdr_fixcolvals" είναι σημαντική καθώς διαβάζει ένα προς ένα

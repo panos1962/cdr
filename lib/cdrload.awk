@@ -48,8 +48,6 @@
 # την database τα ήδη εισαχθέντα CDRs και να τα εισαγάγει εκ νέου (replace
 # mode), είτε να αγνοήσει το νέο αρχείο (insert mode).
 
-@load "spawk"
-
 BEGIN {
 	OFS = " "
 

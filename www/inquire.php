@@ -133,9 +133,10 @@ cdr.formatData = (x) => {
 cdr.formatDataPart = (x, n, dom) => {
 	let i;
 	let count = 0;
+	let orio = (n > 200 ? 1000 : 100)
 
 	for (i = n; i < x.length; i++) {
-		if (count++ >= 100)
+		if (count++ >= orio)
 		break;
 
 		dom.append($('<tr>').

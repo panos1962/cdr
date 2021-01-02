@@ -77,6 +77,7 @@ $(document.body).ready(() => {
 			},
 			"success": (rsp) => {
 				var x;
+console.log(rsp);
 
 				try {
 					eval('x = ' + rsp + ';');

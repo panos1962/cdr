@@ -1,24 +1,23 @@
 <?php
 session_start();
 
-if (@$_SESSION["dbaccess"]) {
+if (@$_SESSION["dbpass"]) {
 	header('Location: inquire.php');
 	exit(0);
 }
 ?>
 
 <html>
-
 <head>
+<title>CDR-Login</title>
+<link rel="icon" type="image/png" href="images/cdr.png">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
 <script>
-
 cdr = {};
 
 $(document.body).ready(() => {
 	cdr.passDOM = $('#pass').focus();
-	cdr.formaIsodosDOM = $('#formaIsodos').
+	cdr.formaDOM = $('#forma').
 	on('submit', function() {
 		$.post({
 			"url": "isodos.php",
@@ -41,24 +40,18 @@ $(document.body).ready(() => {
 		return false;
 	});
 });
-
 </script>
-
-<style>
-</style>
-
 </head>
 
 <body>
-<form id="formaIsodos">
+<form id="forma">
 <p>
 <label for="pass">Password</label>
-<input id="pass" type="password">
+<input id="pass" type="password" size="10">
 </p>
 <p>
 <input type="submit" value="Submit">
 </p>
 </form>
 </body>
-
 </html>

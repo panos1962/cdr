@@ -18,16 +18,27 @@ if (!$_SESSION["dbpass"]) {
 .phone {
 	width: 14ex;
 }
-.date {
-	width: 18ex;
-}
 .button {
 	margin-left: 16px;
+}
+#imerominia {
+	width: 18ex;
+}
+#meres {
+	width: 10ex;
+}
+.data {
+	background-color: #FFFFDD;
+}
+.overflow {
+	background-color: #FFDEDE;
 }
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
-cdr = {};
+cdr = {
+	"orio": 2,
+};
 
 $(document.body).ready(() => {
 	cdr.dataDOM = $('#data');
@@ -48,8 +59,8 @@ $(document.body).ready(() => {
 	cdr.callingDOM = $('#calling').focus();
 	cdr.calledDOM = $('#called');
 	cdr.finalDOM = $('#final');
-	cdr.apoDOM = $('#apo');
-	cdr.eosDOM = $('#eos');
+	cdr.imerominiaDOM = $('#imerominia');
+	cdr.meresDOM = $('#meres');
 
 	cdr.formaDOM = $('#forma').
 	on('submit', () => {
@@ -60,8 +71,9 @@ $(document.body).ready(() => {
 				"calling": cdr.callingDOM.val(),
 				"called": cdr.calledDOM.val(),
 				"final": cdr.finalDOM.val(),
-				"apo": cdr.apoDOM.val(),
-				"eos": cdr.eosDOM.val(),
+				"imerominia": cdr.imerominiaDOM.val(),
+				"meres": cdr.meresDOM.val(),
+				"orio": cdr.orio,
 			},
 			"success": (rsp) => {
 				var x;
@@ -90,7 +102,7 @@ $(document.body).ready(() => {
 });
 
 cdr.formatData = (x) => {
-	let tableDOM = $('<tbody>');
+	let tableDOM = $('<tbody>').addClass('data');
 
 	cdr.dataDOM.
 	empty().
@@ -113,6 +125,11 @@ cdr.formatData = (x) => {
 		append($('<td>').text(x[i].b)).
 		append($('<td>').text(x[i].e)).
 		append($('<td>').text(x[i].h)));
+
+		if (i >= cdr.orio) {
+			tableDOM.addClass('overflow');
+			break;
+		}
 	}
 };
 </script>
@@ -126,10 +143,11 @@ cdr.formatData = (x) => {
 <input id="called" class="phone">
 <label for="final">Final</label>
 <input id="final" class="phone">
-<label for="apo">From</label>
-<input id="apo" class="date" type="date">
-<label for="eos">To</label>
-<input id="eos" class="date" type="date">
+<label for="imerominia">Date</label>
+<input id="imerominia" type="date" value="<?php echo date('Y-m-d'); ?>">
+<label for="meres">Days</label>
+<input id="meres" type="number">
+
 <input class="button" type="submit" value="Submit">
 <input class="button" type="reset" value="Clear">
 <input class="button" id="logout" type="button" value="Logout">

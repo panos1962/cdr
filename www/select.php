@@ -9,6 +9,8 @@ $db = @new mysqli("localhost", "cucminq", $_SESSION["dbpass"], "cucm");
 if ($db->connect_error)
 database_connection_error();
 
+apo_eos();
+
 $query = "SELECT ";
 $query .= "`callingPartyNumber`, ";
 $query .= "`originalCalledPartyNumber`, ";
@@ -27,16 +29,21 @@ $query .= "AND `callingPartyNumber` LIKE '" . $db->real_escape_string($_POST["ca
 if ($_POST["called"])
 $query .= "AND `originalCalledPartyNumber` LIKE '" . $db->real_escape_string($_POST["called"]) . "' ";
 
-if ($_POST["apo"])
-$query .= "AND `dateTimeConnect` >= '" . $db->real_escape_string($_POST["apo"]) . " 00:00:00' ";
+if ($apo)
+$query .= "AND `dateTimeConnect` >= '" . $apo . "' ";
 
-if ($_POST["eos"])
-$query .= "AND `dateTimeConnect` <= '" . $db->real_escape_string($_POST["eos"]) . " 23:59:59' ";
+if ($eos)
+$query .= "AND `dateTimeConnect` < '" . $eos . "' ";
+
+$query .= "ORDER BY `dateTimeConnect`, `callingPartyNumber` ";
+
+if ($_POST["orio"])
+$query .= "LIMIT " . ($_POST["orio"] + 1);
 
 $res = $db->query($query);
 
 if (!$res)
-lathos("SQL");
+lathos("SQL:" . $query);
 
 print '{data: [';
 
@@ -60,13 +67,57 @@ print ']}';
 $res->close();
 $db->close();
 
+function apo_eos() {
+	global $db;
+	global $apo;
+	global $eos;
+
+	$apo = NULL;
+	$eos = NULL;
+
+	if (!$_POST["imerominia"])
+	return;
+
+	$imerominia = $_POST["imerominia"];
+	$meres = intval($_POST["meres"]);
+
+	if (!$meres)
+	$meres = 1;
+
+	$query = "SELECT ";
+
+	if ($meres > 0)
+	$query .= "DATE_FORMAT('" . $imerominia . "', '%Y-%m-%d'), " .
+		"DATE_FORMAT(DATE_ADD('" . $imerominia . "', INTERVAL " .
+		$meres . " DAY), '%Y-%m-%d') ";
+
+	else
+	$query .= "DATE_FORMAT(DATE_SUB('" . $imerominia . "', INTERVAL " .
+		-$meres . " DAY),  '%Y-%m-%d'), " . "DATE_FORMAT(" .
+		"DATE_ADD('" . $imerominia . "', INTERVAL 1 DAY), '%Y-%m-%d') ";
+
+	if (!($res = $db->query($query)))
+	lathos($query);
+
+	while ($row = $res->fetch_row()) {
+		$apo = $row[0];
+		$eos = $row[1];
+	}
+
+	$res->close();
+}
+
 function database_connection_error() {
 	unset($_SESSION["dbpass"]);
 	die('{"error":"db"}');
 }
 
 function lathos($msg) {
+	global $db;
+
+	if ($db)
 	$db->close();
+
 	die('{"error":"' . $msg . '}');
 }
 ?>

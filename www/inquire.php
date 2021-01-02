@@ -22,7 +22,7 @@ if (!$_SESSION["dbpass"]) {
 	margin-left: 16px;
 }
 #imerominia {
-	width: 18ex;
+	width: 19ex;
 }
 #meres {
 	width: 10ex;
@@ -37,7 +37,7 @@ if (!$_SESSION["dbpass"]) {
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
 cdr = {
-	"orio": 2,
+	"orio": 1000,
 };
 
 $(document.body).ready(() => {

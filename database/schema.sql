@@ -69,14 +69,6 @@ CREATE TABLE `cdr` (
 	) USING BTREE,
 
 	INDEX (
-		`origIpAddr`
-	) USING BTREE,
-
-	INDEX (
-		`destIpAddr`
-	) USING BTREE,
-
-	INDEX (
 		`callingPartyNumber`
 	) USING BTREE,
 
@@ -85,7 +77,7 @@ CREATE TABLE `cdr` (
 	) USING BTREE,
 
 	INDEX (
-		`finalCalledPartyNumber`
+		`dateTimeOrigination`
 	) USING BTREE
 )
 

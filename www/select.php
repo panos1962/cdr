@@ -15,6 +15,7 @@ $query = "SELECT ";
 $query .= "`callingPartyNumber`, ";
 $query .= "`originalCalledPartyNumber`, ";
 $query .= "`finalCalledPartyNumber`, ";
+$query .= "`dateTimeOrigination`, ";
 $query .= "`dateTimeConnect`, ";
 $query .= "`dateTimeDisconnect`, ";
 $query .= "`origIpAddr`, ";
@@ -30,12 +31,12 @@ if ($_POST["called"])
 $query .= "AND `originalCalledPartyNumber` LIKE '" . $db->real_escape_string($_POST["called"]) . "' ";
 
 if ($apo)
-$query .= "AND `dateTimeConnect` >= '" . $apo . "' ";
+$query .= "AND `dateTimeOrigination` >= '" . $apo . "' ";
 
 if ($eos)
-$query .= "AND `dateTimeConnect` < '" . $eos . "' ";
+$query .= "AND `dateTimeOrigination` < '" . $eos . "' ";
 
-$query .= "ORDER BY `dateTimeConnect`, `callingPartyNumber` ";
+$query .= "ORDER BY `dateTimeOrigination`, `callingPartyNumber` ";
 
 if ($_POST["orio"])
 $query .= "LIMIT " . ($_POST["orio"] + 1);
@@ -46,6 +47,16 @@ if (!$res)
 lathos("SQL:" . $query);
 
 print '{data: [';
+$query .= "`callingPartyNumber`, ";
+$query .= "`originalCalledPartyNumber`, ";
+$query .= "`finalCalledPartyNumber`, ";
+$query .= "`dateTimeOrigination`, ";
+$query .= "`dateTimeConnect`, ";
+$query .= "`dateTimeDisconnect`, ";
+$query .= "`origIpAddr`, ";
+$query .= "`destIpAddr`, ";
+$query .= "`huntPilotPattern` ";
+
 
 $sep = '{';
 while ($row = $res->fetch_row()) {
@@ -53,6 +64,7 @@ while ($row = $res->fetch_row()) {
 	printf($sep);
 	printf("c:'%s',", $row[$nf++]);
 	printf("o:'%s',", $row[$nf++]);
+	printf("r:'%s',", $row[$nf++]);
 	printf("f:'%s',", $row[$nf++]);
 	printf("b:'%s',", $row[$nf++]);
 	printf("e:'%s',", $row[$nf++]);

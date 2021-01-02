@@ -12,10 +12,10 @@ database_connection_error();
 apo_eos();
 
 $query = "SELECT ";
+$query .= "`dateTimeOrigination`, ";
 $query .= "`callingPartyNumber`, ";
 $query .= "`originalCalledPartyNumber`, ";
 $query .= "`finalCalledPartyNumber`, ";
-$query .= "`dateTimeOrigination`, ";
 $query .= "`dateTimeConnect`, ";
 $query .= "`dateTimeDisconnect`, ";
 $query .= "`origIpAddr`, ";
@@ -47,24 +47,14 @@ if (!$res)
 lathos("SQL:" . $query);
 
 print '{data: [';
-$query .= "`callingPartyNumber`, ";
-$query .= "`originalCalledPartyNumber`, ";
-$query .= "`finalCalledPartyNumber`, ";
-$query .= "`dateTimeOrigination`, ";
-$query .= "`dateTimeConnect`, ";
-$query .= "`dateTimeDisconnect`, ";
-$query .= "`origIpAddr`, ";
-$query .= "`destIpAddr`, ";
-$query .= "`huntPilotPattern` ";
-
 
 $sep = '{';
 while ($row = $res->fetch_row()) {
 	$nf = 0;
 	printf($sep);
+	printf("r:'%s',", $row[$nf++]);
 	printf("c:'%s',", $row[$nf++]);
 	printf("o:'%s',", $row[$nf++]);
-	printf("r:'%s',", $row[$nf++]);
 	printf("f:'%s',", $row[$nf++]);
 	printf("b:'%s',", $row[$nf++]);
 	printf("e:'%s',", $row[$nf++]);

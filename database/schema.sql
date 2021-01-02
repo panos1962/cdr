@@ -69,15 +69,15 @@ CREATE TABLE `cdr` (
 	) USING BTREE,
 
 	INDEX (
+		`dateTimeOrigination`
+	) USING BTREE,
+
+	INDEX (
 		`callingPartyNumber`
 	) USING BTREE,
 
 	INDEX (
 		`originalCalledPartyNumber`
-	) USING BTREE,
-
-	INDEX (
-		`dateTimeOrigination`
 	) USING BTREE
 )
 

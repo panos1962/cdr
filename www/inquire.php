@@ -112,8 +112,9 @@ cdr.formatData = (x) => {
 	append($('<th>').text('Calling')).
 	append($('<th>').text('Called')).
 	append($('<th>').text('Final')).
-	append($('<th>').text('Begin')).
-	append($('<th>').text('End')).
+	append($('<th>').text('Origination')).
+	append($('<th>').text('Connect')).
+	append($('<th>').text('Disconnect')).
 	append($('<th>').text('Hunt')))).
 	append(tableDOM));
 
@@ -122,6 +123,7 @@ cdr.formatData = (x) => {
 		append($('<td>').text(x[i].c)).
 		append($('<td>').text(x[i].o)).
 		append($('<td>').text(x[i].f)).
+		append($('<td>').text(x[i].r)).
 		append($('<td>').text(x[i].b)).
 		append($('<td>').text(x[i].e)).
 		append($('<td>').text(x[i].h)));

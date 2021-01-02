@@ -31,10 +31,10 @@ if ($_POST["called"])
 $query .= "AND `originalCalledPartyNumber` LIKE '" . $db->real_escape_string($_POST["called"]) . "' ";
 
 if ($apo)
-$query .= "AND `dateTimeOrigination` >= '" . $apo . "' ";
+$query .= "AND `dateTimeOrigination` >= '" . $apo . " 00:00:00' ";
 
 if ($eos)
-$query .= "AND `dateTimeOrigination` < '" . $eos . "' ";
+$query .= "AND `dateTimeOrigination` < '" . $eos . " 00:00:00' ";
 
 $query .= "ORDER BY `dateTimeOrigination`, `callingPartyNumber` ";
 
@@ -46,7 +46,7 @@ $res = $db->query($query);
 if (!$res)
 lathos("SQL:" . $query);
 
-print "{query:'" . $db->real_escape_string($query) . "',data:[";
+print '{query:"' . $query . '",data:[';
 
 $sep = '{';
 while ($row = $res->fetch_row()) {
@@ -64,7 +64,7 @@ while ($row = $res->fetch_row()) {
 	print '}';
 	$sep = ',{';
 }
-print "]}";
+print ']}';
 
 $res->close();
 $db->close();

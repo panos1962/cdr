@@ -27,6 +27,9 @@ if (!$_SESSION["dbpass"]) {
 #meres {
 	width: 10ex;
 }
+#orio {
+	width: 10ex;
+}
 .data {
 	background-color: #FFFFDD;
 }
@@ -36,9 +39,7 @@ if (!$_SESSION["dbpass"]) {
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
-cdr = {
-	"orio": 1000,
-};
+cdr = {};
 
 $(document.body).ready(() => {
 	cdr.dataDOM = $('#data');
@@ -61,9 +62,16 @@ $(document.body).ready(() => {
 	cdr.finalDOM = $('#final');
 	cdr.imerominiaDOM = $('#imerominia');
 	cdr.meresDOM = $('#meres');
+	cdr.orioDOM = $('#orio');
 
 	cdr.formaDOM = $('#forma').
 	on('submit', () => {
+		if (cdr.timer)
+		clearTimeout(cdr.timer);
+		
+		cdr.dataDOM.empty();
+		cdr.orio = cdr.orioDOM.val();
+
 		$.post({
 			"url": "select.php",
 			"method": "POST",
@@ -77,7 +85,6 @@ $(document.body).ready(() => {
 			},
 			"success": (rsp) => {
 				var x;
-console.log(rsp);
 
 				try {
 					eval('x = ' + rsp + ';');
@@ -103,10 +110,9 @@ console.log(rsp);
 });
 
 cdr.formatData = (x) => {
-	let tableDOM = $('<tbody>').addClass('data');
+	let dom = $('<tbody>');
 
 	cdr.dataDOM.
-	empty().
 	append($('<table border="yes">').
 	append($('<thead>').
 	append($('<tr>').
@@ -117,10 +123,20 @@ cdr.formatData = (x) => {
 	append($('<th>').text('Connect')).
 	append($('<th>').text('Disconnect')).
 	append($('<th>').text('Hunt')))).
-	append(tableDOM));
+	append(dom));
 
-	for (let i = 0; i < x.length; i++) {
-		tableDOM.append($('<tr>').
+	cdr.formatDataPart(x, 0, dom);
+};
+
+cdr.formatDataPart = (x, n, dom) => {
+	let i;
+	let count = 0;
+
+	for (i = n; i < x.length; i++) {
+		if (count++ >= 100)
+		break;
+
+		dom.append($('<tr>').
 		append($('<td>').text(x[i].c)).
 		append($('<td>').text(x[i].o)).
 		append($('<td>').text(x[i].f)).
@@ -129,11 +145,16 @@ cdr.formatData = (x) => {
 		append($('<td>').text(x[i].e)).
 		append($('<td>').text(x[i].h)));
 
-		if (i >= cdr.orio) {
-			tableDOM.addClass('overflow');
-			break;
-		}
+		if (i >= cdr.orio)
+		return dom.addClass('overflow');
 	}
+
+	if (i >= x.length)
+	return dom.addClass('data');
+
+	cdr.timer = setTimeout(() => {
+		cdr.formatDataPart(x, i, dom);
+	}, 0);
 };
 </script>
 </head>
@@ -150,6 +171,8 @@ cdr.formatData = (x) => {
 <input id="imerominia" type="date" value="<?php echo date('Y-m-d'); ?>">
 <label for="meres">Days</label>
 <input id="meres" type="number">
+<label for="orio">Limit</label>
+<input id="orio" value="1000" type="number" step="1000" min="1000">
 
 <input class="button" type="submit" value="Submit">
 <input class="button" type="reset" value="Clear">

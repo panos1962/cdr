@@ -65,49 +65,51 @@ $(document.body).ready(() => {
 	cdr.orioDOM = $('#orio');
 
 	cdr.formaDOM = $('#forma').
-	on('submit', () => {
-		if (cdr.timer)
-		clearTimeout(cdr.timer);
+	on('submit', cdr.submit);
 		
-		cdr.dataDOM.empty();
-		cdr.orio = cdr.orioDOM.val();
+});
 
-		$.post({
-			"url": "select.php",
-			"method": "POST",
-			"data": {
-				"calling": cdr.callingDOM.val(),
-				"called": cdr.calledDOM.val(),
-				"final": cdr.finalDOM.val(),
-				"imerominia": cdr.imerominiaDOM.val(),
-				"meres": cdr.meresDOM.val(),
-				"orio": cdr.orio,
-			},
-			"success": (rsp) => {
-				var x;
+cdr.submit = () => {
+	if (cdr.timer)
+	clearTimeout(cdr.timer);
+	
+	cdr.dataDOM.empty();
+	cdr.orio = cdr.orioDOM.val();
 
-				try {
-					eval('x = ' + rsp + ';');
-				}
-				catch (e) {
-					console.error(e);
-					return;
-				}
+	$.post({
+		"url": "select.php",
+		"method": "POST",
+		"data": {
+			"calling": cdr.callingDOM.val(),
+			"called": cdr.calledDOM.val(),
+			"final": cdr.finalDOM.val(),
+			"imerominia": cdr.imerominiaDOM.val(),
+			"meres": cdr.meresDOM.val(),
+			"orio": cdr.orio,
+		},
+		"success": (rsp) => {
+			var x;
 
-				if (x.error === 'db')
-				self.location = 'index.php';
+			try {
+				eval('x = ' + rsp + ';');
+			}
+			catch (e) {
+				console.error(e);
+				return;
+			}
 
-				cdr.formatData(x.data);
-			},
-			"error": (err) => {
-				console.error(err);
-			},
-		});
+			if (x.error === 'db')
+			self.location = 'index.php';
 
-		return false;
+			cdr.formatData(x.data);
+		},
+		"error": (err) => {
+			console.error(err);
+		},
 	});
 
-});
+	return false;
+};
 
 cdr.formatData = (x) => {
 	let dom = $('<tbody>');
@@ -145,12 +147,18 @@ cdr.formatDataPart = (x, n, dom) => {
 		append($('<td>').text(x[i].e)).
 		append($('<td>').text(x[i].h)));
 
-		if (i >= cdr.orio)
-		return dom.addClass('overflow');
+		if (i >= cdr.orio) {
+			dom.addClass('overflow');
+			delete cdr.timer;
+			return;
+		}
 	}
 
-	if (i >= x.length)
-	return dom.addClass('data');
+	if (i >= x.length) {
+		dom.addClass('data');
+		delete cdr.timer;
+		return;
+	}
 
 	cdr.timer = setTimeout(() => {
 		cdr.formatDataPart(x, i, dom);

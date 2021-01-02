@@ -46,7 +46,7 @@ $res = $db->query($query);
 if (!$res)
 lathos("SQL:" . $query);
 
-print "{query:'" + $db->real_escape_string($query) + "',data:[";
+print "{query:'" . $db->real_escape_string($query) . "',data:[";
 
 $sep = '{';
 while ($row = $res->fetch_row()) {

@@ -50,6 +50,9 @@ if (!$_SESSION["dbpass"]) {
 	text-align: right;
 	color: grey;
 }
+#meta {
+	margin-bottom: 2px;
+}
 #total {
 	display: inline-block;
 	margin-right: 8px;
@@ -177,11 +180,14 @@ cdr.submit = () => {
 	return false;
 };
 
+cdr.MIN_DATE = 0;
+cdr.MAX_DATE = 999999999999;
+
 cdr.scanfix = () => {
 	let x = cdr.data;
 
-	cdr.minDate = Number.MAX_VALUE;
-	cdr.maxDate = Number.MIN_VALUE;
+	cdr.minDate = cdr.MAX_DATE;
+	cdr.maxDate = cdr.MIN_DATE;
 
 	for (let i = 0; i < x.length; i++) {
 		// Δημιουργούμε στήλη αύξοντος αριθμού.
@@ -199,7 +205,7 @@ cdr.scanfix = () => {
 
 		x[i].d = x[i].b ? x[i].e - x[i].b : 0;
 
-		if (x[i].r > cdr.maxDate)
+ 		if (x[i].r > cdr.maxDate)
 		cdr.maxDate = x[i].r;
 
 		if (x[i].r < cdr.minDate)
@@ -208,14 +214,21 @@ cdr.scanfix = () => {
 };
 
 cdr.formatData = () => {
+	let metaDOM = $('<div>').attr('id', 'meta');
+
+	metaDOM.
+	append($('<div>').attr('id', 'total').text(cdr.data.length));
+
+	if ((cdr.minDate !== cdr.MAX_DATE) && (cdr.maxDate !== cdr.MIN_DATE))
+	metaDOM.
+	append($('<div>').attr('id', 'minDate').text(cdr.datetime(cdr.minDate))).
+	append($('<div>').attr('id', 'maxDate').text(cdr.datetime(cdr.maxDate)));
+
 	cdr.tbodyDOM = $('<tbody>');
 
 	cdr.dataDOM.
 	empty().
-	append($('<div>').
-	append($('<div>').attr('id', 'total').text(cdr.data.length)).
-	append($('<div>').attr('id', 'minDate').text(cdr.datetime(cdr.minDate))).
-	append($('<div>').attr('id', 'maxDate').text(cdr.datetime(cdr.maxDate)))).
+	append(metaDOM).
 	append($('<table border="yes">').
 	append($('<thead>').
 	append($('<tr>').

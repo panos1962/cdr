@@ -115,6 +115,7 @@ cdr.formatData = (x) => {
 	let dom = $('<tbody>');
 
 	cdr.dataDOM.
+	empty().
 	append($('<table border="yes">').
 	append($('<thead>').
 	append($('<tr>').

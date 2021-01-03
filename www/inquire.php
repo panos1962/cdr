@@ -236,6 +236,9 @@ cdr.formatData = () => {
 	addClass('sortable').
 	data('order', -1).
 	on('click', function(e) {
+		if (cdr.isBusy())
+		return;
+
 		clearTimeout(cdr.timer);
 		let ord = $(this).data('order');
 		$(this).data('order', ord === 1 ? -1 : 1);
@@ -258,6 +261,9 @@ cdr.formatData = () => {
 	addClass('sortable').
 	data('order', 1).
 	on('click', function(e) {
+		if (cdr.isBusy())
+		return;
+
 		clearTimeout(cdr.timer);
 		let ord = $(this).data('order');
 		$(this).data('order', ord === 1 ? -1 : 1);
@@ -286,6 +292,9 @@ cdr.formatData = () => {
 	addClass('sortable').
 	data('order', 1).
 	on('click', function(e) {
+		if (cdr.isBusy())
+		return;
+
 		clearTimeout(cdr.timer);
 		let ord = $(this).data('order');
 		$(this).data('order', ord === 1 ? -1 : 1);
@@ -314,6 +323,9 @@ cdr.formatData = () => {
 	addClass('sortable').
 	data('order', 1).
 	on('click', function(e) {
+		if (cdr.isBusy())
+		return;
+
 		clearTimeout(cdr.timer);
 		let ord = $(this).data('order');
 		$(this).data('order', ord === 1 ? -1 : 1);
@@ -345,6 +357,9 @@ cdr.formatData = () => {
 	addClass('sortable').
 	data('order', -1).
 	on('click', function(e) {
+		if (cdr.isBusy())
+		return;
+
 		clearTimeout(cdr.timer);
 		let ord = $(this).data('order');
 		$(this).data('order', ord === 1 ? -1 : 1);

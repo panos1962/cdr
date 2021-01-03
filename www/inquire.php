@@ -45,6 +45,12 @@ if (!$_SESSION["dbpass"]) {
 	user-select: none;
 	cursor: ns-resize;
 }
+.count {
+	padding: 0px 2px;
+	text-align: right;
+	font-style: italic;
+	color: grey;
+}
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
@@ -126,8 +132,10 @@ cdr.submit = () => {
 			if (x.error === 'db')
 			self.location = 'index.php';
 
-			for (let i = 0; i < x.data.length; i++)
-			x.data[i].d = x.data[i].b ? x.data[i].e - x.data[i].b : 0;
+			for (let i = 0; i < x.data.length; i++) {
+				x.data[i].d = x.data[i].b ? x.data[i].e - x.data[i].b : 0;
+				x.data[i].i = i + 1;
+			}
 
 			cdr.data = x.data;
 			cdr.formatData();
@@ -149,6 +157,28 @@ cdr.formatData = () => {
 	append($('<table border="yes">').
 	append($('<thead>').
 	append($('<tr>').
+	append($('<th>').text('#').
+	addClass('sortable').
+	data('order', -1).
+	on('click', function(e) {
+		clearTimeout(cdr.timer);
+		let ord = $(this).data('order');
+		$(this).data('order', ord === 1 ? -1 : 1);
+		cdr.tbodyDOM.empty();
+
+		cdr.timer = setTimeout(() => {
+			cdr.data.sort((a, b) => {
+				if (a.i < b.i)
+				return -ord;
+
+				if (a.i > b.i)
+				return ord;
+
+				return 0;
+			});
+			cdr.formatDataPart(0);
+		}, 0);
+	})).
 	append($('<th>').text('Calling').
 	addClass('sortable').
 	data('order', 1).
@@ -287,6 +317,7 @@ cdr.formatDataPart = (n) => {
 		let disconnect = cdr.datetime(x[i].e);
 
 		cdr.tbodyDOM.append($('<tr>').
+		append($('<td>').addClass('count').text(x[i].i)).
 		append($('<td>').text(x[i].c)).
 		append($('<td>').text(x[i].o)).
 		append($('<td>').text(x[i].f)).

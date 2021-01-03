@@ -20,6 +20,7 @@ if (!$_SESSION["dbpass"]) {
 }
 .button {
 	margin-left: 16px;
+	cursor: pointer;
 }
 #imerominia {
 	width: 19ex;
@@ -36,14 +37,33 @@ if (!$_SESSION["dbpass"]) {
 .overflow {
 	background-color: #FFDEDE;
 }
+.sortable {
+	user-select: none;
+	cursor: ns-resize;
+}
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
 cdr = {};
 
 $(document.body).ready(() => {
-	cdr.dataDOM = $('#data');
-	cdr.logoutDOM = $('#logout').
+	cdr.callingDOM = $('#calling').focus();
+	cdr.calledDOM = $('#called');
+	cdr.finalDOM = $('#final');
+	cdr.imerominiaDOM = $('#imerominia');
+	cdr.meresDOM = $('#meres');
+	cdr.orioDOM = $('#orio');
+
+	$('#clear').
+	on('click', () => {
+		cdr.callingDOM.val('');
+		cdr.calledDOM.val('');
+		cdr.finalDOM.val('');
+		cdr.imerominiaDOM.val('');
+		cdr.meresDOM.val('');
+	});
+
+	$('#logout').
 	on('click', function() {
 		$.post({
 			"url": "exodos.php",
@@ -57,16 +77,9 @@ $(document.body).ready(() => {
 		});
 	});
 
-	cdr.callingDOM = $('#calling').focus();
-	cdr.calledDOM = $('#called');
-	cdr.finalDOM = $('#final');
-	cdr.imerominiaDOM = $('#imerominia');
-	cdr.meresDOM = $('#meres');
-	cdr.orioDOM = $('#orio');
-
+	cdr.dataDOM = $('#data');
 	cdr.formaDOM = $('#forma').
 	on('submit', cdr.submit);
-		
 });
 
 cdr.submit = () => {
@@ -101,7 +114,11 @@ cdr.submit = () => {
 			if (x.error === 'db')
 			self.location = 'index.php';
 
-			cdr.formatData(x.data);
+			for (let i = 0; i < x.data.length; i++)
+			x.data[i].d = x.data[i].b ? x.data[i].e - x.data[i].b : 0;
+
+			cdr.data = x.data;
+			cdr.formatData();
 		},
 		"error": (err) => {
 			console.error(err);
@@ -111,31 +128,141 @@ cdr.submit = () => {
 	return false;
 };
 
-cdr.formatData = (x) => {
-	let dom = $('<tbody>');
+cdr.formatData = () => {
+	cdr.tbodyDOM = $('<tbody>');
 
 	cdr.dataDOM.
 	empty().
 	append($('<table border="yes">').
 	append($('<thead>').
 	append($('<tr>').
-	append($('<th>').text('Calling')).
-	append($('<th>').text('Called')).
-	append($('<th>').text('Final')).
+	append($('<th>').text('Calling').
+	addClass('sortable').
+	data('order', 1).
+	on('click', function(e) {
+		clearTimeout(cdr.timer);
+		let ord = $(this).data('order');
+		$(this).data('order', ord === 1 ? -1 : 1);
+		cdr.tbodyDOM.empty();
+
+		cdr.timer = setTimeout(() => {
+			cdr.data.sort((a, b) => {
+				if (a.c < b.c)
+				return -ord;
+
+				if (a.c > b.c)
+				return ord;
+
+				if (a.o < b.o)
+				return -1;
+
+				if (a.o > b.o)
+				return 1;
+
+				return 0;
+			});
+			cdr.formatDataPart(0);
+		}, 0);
+	})).
+	append($('<th>').text('Called').
+	addClass('sortable').
+	data('order', 1).
+	on('click', function(e) {
+		clearTimeout(cdr.timer);
+		let ord = $(this).data('order');
+		$(this).data('order', ord === 1 ? -1 : 1);
+		cdr.tbodyDOM.empty();
+
+		cdr.timer = setTimeout(() => {
+			cdr.data.sort((a, b) => {
+				if (a.o < b.o)
+				return -ord;
+
+				if (a.o > b.o)
+				return ord;
+
+				if (a.c < b.c)
+				return -1;
+
+				if (a.c > b.c)
+				return 1;
+
+				return 0;
+			});
+			cdr.formatDataPart(0);
+		}, 0);
+	})).
+	append($('<th>').text('Final').
+	addClass('sortable').
+	data('order', 1).
+	on('click', function(e) {
+		clearTimeout(cdr.timer);
+		let ord = $(this).data('order');
+		$(this).data('order', ord === 1 ? -1 : 1);
+		cdr.tbodyDOM.empty();
+
+		cdr.timer = setTimeout(() => {
+			cdr.data.sort((a, b) => {
+				if (a.f < b.f)
+				return -ord;
+
+				if (a.f > b.f)
+				return ord;
+
+				if (a.c < b.c)
+				return -1;
+
+				if (a.c > b.c)
+				return 1;
+
+				return 0;
+			});
+			cdr.formatDataPart(0);
+		}, 0);
+	})).
 	append($('<th>').text('Origination')).
 	append($('<th>').text('Connect')).
 	append($('<th>').text('Disconnect')).
-	append($('<th>').text('Duration')).
-	append($('<th>').text('Hunt')))).
-	append(dom));
+	append($('<th>').text('Duration').
+	addClass('sortable').
+	data('order', -1).
+	on('click', function(e) {
+		clearTimeout(cdr.timer);
+		let ord = $(this).data('order');
+		$(this).data('order', ord === 1 ? -1 : 1);
+		cdr.tbodyDOM.empty();
 
-	cdr.formatDataPart(x, 0, dom);
+		cdr.timer = setTimeout(() => {
+			cdr.data.sort((a, b) => {
+				if (a.d < b.d)
+				return -ord;
+
+				if (a.d > b.d)
+				return ord;
+
+				if (a.c < b.c)
+				return -1;
+
+				if (a.c > b.c)
+				return 1;
+
+				return 0;
+			});
+
+			cdr.formatDataPart(0);
+		}, 0);
+	})).
+	append($('<th>').text('Hunt')))).
+	append(cdr.tbodyDOM));
+
+	cdr.formatDataPart(0);
 };
 
-cdr.formatDataPart = (x, n, dom) => {
+cdr.formatDataPart = (n) => {
 	let i;
 	let count = 0;
 	let orio = (n > 200 ? 1000 : 100)
+	let x = cdr.data;
 
 	for (i = n; i < x.length; i++) {
 		if (count++ >= orio)
@@ -146,31 +273,31 @@ cdr.formatDataPart = (x, n, dom) => {
 		let connect = cdr.datetime(x[i].b);
 		let disconnect = cdr.datetime(x[i].e);
 
-		dom.append($('<tr>').
+		cdr.tbodyDOM.append($('<tr>').
 		append($('<td>').text(x[i].c)).
 		append($('<td>').text(x[i].o)).
 		append($('<td>').text(x[i].f)).
 		append($('<td>').text(origination)).
 		append($('<td>').text(connect)).
 		append($('<td>').text(disconnect)).
-		append($('<td>').text(dur)).
+		append($('<td>').text(cdr.dur2hms(x[i].d))).
 		append($('<td>').text(x[i].h)));
 
 		if (i >= cdr.orio) {
-			dom.addClass('overflow');
+			cdr.tbodyDOM.addClass('overflow');
 			delete cdr.timer;
 			return;
 		}
 	}
 
 	if (i >= x.length) {
-		dom.addClass('data');
+		cdr.tbodyDOM.addClass('data');
 		delete cdr.timer;
 		return;
 	}
 
 	cdr.timer = setTimeout(() => {
-		cdr.formatDataPart(x, i, dom);
+		cdr.formatDataPart(i);
 	}, 0);
 };
 
@@ -205,6 +332,29 @@ cdr.datetime = (t) => {
 
 	return t;
 };
+
+cdr.dur2hms = (x) => {
+	let hms = '';
+
+	if (!x)
+	return hms;
+
+	let s = x % 60;
+	x = parseInt(x / 60);
+	let m = x % 60;
+	x = parseInt(m / 60);
+
+	if (s)
+	hms = s + 's';
+
+	if (m)
+	hms = m + 'm' + hms;
+
+	if (x)
+	hms = x + 'h' + hms;
+
+	return hms;
+};
 </script>
 </head>
 
@@ -217,14 +367,14 @@ cdr.datetime = (t) => {
 <label for="final">Final</label>
 <input id="final" class="phone">
 <label for="imerominia">Date</label>
-<input id="imerominia" type="date" value="<?php echo date('Y-m-d'); ?>">
+<input id="imerominia" type="date">
 <label for="meres">Days</label>
 <input id="meres" type="number">
 <label for="orio">Limit</label>
 <input id="orio" value="1000" type="number" step="1000" min="1000">
 
 <input class="button" type="submit" value="Submit">
-<input class="button" type="reset" value="Clear">
+<input class="button" id="clear" type="button" value="Clear">
 <input class="button" id="logout" type="button" value="Logout">
 </form>
 <div id="data">

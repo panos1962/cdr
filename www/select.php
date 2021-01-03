@@ -36,7 +36,7 @@ $query .= "AND `dateTimeOrigination` >= '" . $apo . " 00:00:00' ";
 if ($eos)
 $query .= "AND `dateTimeOrigination` < '" . $eos . " 00:00:00' ";
 
-$query .= "ORDER BY `dateTimeOrigination`, `callingPartyNumber` ";
+$query .= "ORDER BY `dateTimeOrigination` ";
 
 if ($_POST["orio"])
 $query .= "LIMIT " . ($_POST["orio"] + 1);

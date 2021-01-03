@@ -48,8 +48,19 @@ if (!$_SESSION["dbpass"]) {
 .count {
 	padding: 0px 2px;
 	text-align: right;
-	font-style: italic;
 	color: grey;
+}
+#total {
+	font-family: monospace;
+	font-weight: bold;
+	font-style: normal;
+	font-size: 120%;
+}
+#total::after {
+	content: 'records';
+	margin-left: 4px;
+	font-weight: normal;
+	font-style: italic;
 }
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -166,6 +177,7 @@ cdr.formatData = () => {
 
 	cdr.dataDOM.
 	empty().
+	append($('<div>').attr('id', 'total').text(cdr.data.length)).
 	append($('<table border="yes">').
 	append($('<thead>').
 	append($('<tr>').

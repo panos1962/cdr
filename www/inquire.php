@@ -22,6 +22,10 @@ if (!$_SESSION["dbpass"]) {
 	margin-left: 16px;
 	cursor: pointer;
 }
+.busy {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
 #imerominia {
 	width: 19ex;
 }
@@ -44,7 +48,8 @@ if (!$_SESSION["dbpass"]) {
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
-cdr = {};
+"use strict";
+const cdr = {};
 
 $(document.body).ready(() => {
 	cdr.callingDOM = $('#calling').focus();
@@ -53,6 +58,8 @@ $(document.body).ready(() => {
 	cdr.imerominiaDOM = $('#imerominia');
 	cdr.meresDOM = $('#meres');
 	cdr.orioDOM = $('#orio');
+	cdr.submitDOM = $('#submit');
+	cdr.submitDOM = $('#submit');
 
 	$('#clear').
 	on('click', () => {
@@ -83,6 +90,11 @@ $(document.body).ready(() => {
 });
 
 cdr.submit = () => {
+	if (cdr.isBusy())
+	return false;
+
+	cdr.busySet(true);
+
 	if (cdr.timer)
 	clearTimeout(cdr.timer);
 	
@@ -121,6 +133,7 @@ cdr.submit = () => {
 			cdr.formatData();
 		},
 		"error": (err) => {
+			cdr.busySet(false);
 			console.error(err);
 		},
 	});
@@ -286,6 +299,7 @@ cdr.formatDataPart = (n) => {
 		if (i >= cdr.orio) {
 			cdr.tbodyDOM.addClass('overflow');
 			delete cdr.timer;
+			cdr.busySet(false);
 			return;
 		}
 	}
@@ -293,6 +307,7 @@ cdr.formatDataPart = (n) => {
 	if (i >= x.length) {
 		cdr.tbodyDOM.addClass('data');
 		delete cdr.timer;
+		cdr.busySet(false);
 		return;
 	}
 
@@ -340,9 +355,9 @@ cdr.dur2hms = (x) => {
 	return hms;
 
 	let s = x % 60;
-	x = parseInt(x / 60);
+	x = (x - s) / 60;
 	let m = x % 60;
-	x = parseInt(m / 60);
+	x = (x - m) / 60;
 
 	if (s)
 	hms = s + 's';
@@ -354,6 +369,22 @@ cdr.dur2hms = (x) => {
 	hms = x + 'h' + hms;
 
 	return hms;
+};
+
+cdr.busy = false;
+
+cdr.isBusy = () => {
+	return cdr.busy;
+};
+
+cdr.busySet = (onOff) => {
+	cdr.busy = onOff;
+
+	if (onOff)
+	cdr.submitDOM.addClass('busy');
+
+	else
+	cdr.submitDOM.removeClass('busy');
 };
 </script>
 </head>
@@ -373,7 +404,7 @@ cdr.dur2hms = (x) => {
 <label for="orio">Limit</label>
 <input id="orio" value="1000" type="number" step="1000" min="1000">
 
-<input class="button" type="submit" value="Submit">
+<input class="button" id="submit" type="submit" value="Submit">
 <input class="button" id="clear" type="button" value="Clear">
 <input class="button" id="logout" type="button" value="Logout">
 </form>

@@ -51,10 +51,8 @@ if (!$_SESSION["dbpass"]) {
 	color: grey;
 }
 #total {
-	font-family: monospace;
 	font-weight: bold;
 	font-style: normal;
-	font-size: 120%;
 }
 #total::after {
 	content: 'records';

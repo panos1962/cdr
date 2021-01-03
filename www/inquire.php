@@ -133,8 +133,20 @@ cdr.submit = () => {
 			self.location = 'index.php';
 
 			for (let i = 0; i < x.data.length; i++) {
-				x.data[i].d = x.data[i].b ? x.data[i].e - x.data[i].b : 0;
+				// Δημιουργούμε στήλη αύξοντος αριθμού.
+
 				x.data[i].i = i + 1;
+
+				// Αφαιρούμε το μηδέν μπροστά από τον αριθμό τού
+				// καλούντος για τις εισερχόμενες κλήσεις.
+
+				if (x.data[i].c.match(/^0[1-9]/))
+				x.data[i].c = x.data[i].c.replace(/^0/, "");
+
+				// Υπολογίζουμε τη διάρκεια κλήσης (σε δευτερόλεπτα)
+				// και την αποθηκεύουμε στο πεδίο "d".
+
+				x.data[i].d = x.data[i].b ? x.data[i].e - x.data[i].b : 0;
 			}
 
 			cdr.data = x.data;

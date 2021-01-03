@@ -51,6 +51,8 @@ if (!$_SESSION["dbpass"]) {
 	color: grey;
 }
 #total {
+	display: inline-block;
+	margin-right: 8px;
 	font-weight: bold;
 	font-style: normal;
 }
@@ -59,6 +61,27 @@ if (!$_SESSION["dbpass"]) {
 	margin-left: 4px;
 	font-weight: normal;
 	font-style: italic;
+}
+#minDate {
+	display: inline-block;
+}
+#minDate::before {
+	content: '[';
+	margin: 4px 4px;
+	color: gray;
+}
+#maxDate {
+	display: inline-block;
+}
+#maxDate::before {
+	content: '\2013';
+	margin: 0 4px;
+	color: gray;
+}
+#maxDate::after {
+	content: ']';
+	margin-left: 4px;
+	color: gray;
 }
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -141,24 +164,8 @@ cdr.submit = () => {
 			if (x.error === 'db')
 			self.location = 'index.php';
 
-			for (let i = 0; i < x.data.length; i++) {
-				// Δημιουργούμε στήλη αύξοντος αριθμού.
-
-				x.data[i].i = i + 1;
-
-				// Αφαιρούμε το μηδέν μπροστά από τον αριθμό τού
-				// καλούντος για τις εισερχόμενες κλήσεις.
-
-				if (x.data[i].c.match(/^0[1-9]/))
-				x.data[i].c = x.data[i].c.replace(/^0/, "");
-
-				// Υπολογίζουμε τη διάρκεια κλήσης (σε δευτερόλεπτα)
-				// και την αποθηκεύουμε στο πεδίο "d".
-
-				x.data[i].d = x.data[i].b ? x.data[i].e - x.data[i].b : 0;
-			}
-
 			cdr.data = x.data;
+			cdr.scanfix();
 			cdr.formatData();
 		},
 		"error": (err) => {
@@ -170,12 +177,45 @@ cdr.submit = () => {
 	return false;
 };
 
+cdr.scanfix = () => {
+	let x = cdr.data;
+
+	cdr.minDate = Number.MAX_VALUE;
+	cdr.maxDate = Number.MIN_VALUE;
+
+	for (let i = 0; i < x.length; i++) {
+		// Δημιουργούμε στήλη αύξοντος αριθμού.
+
+		x[i].i = i + 1;
+
+		// Αφαιρούμε το μηδέν μπροστά από τον αριθμό τού
+		// καλούντος για τις εισερχόμενες κλήσεις.
+
+		if (x[i].c.match(/^0[1-9]/))
+		x[i].c = x[i].c.replace(/^0/, "");
+
+		// Υπολογίζουμε τη διάρκεια κλήσης (σε δευτερόλεπτα)
+		// και την αποθηκεύουμε στο πεδίο "d".
+
+		x[i].d = x[i].b ? x[i].e - x[i].b : 0;
+
+		if (x[i].r > cdr.maxDate)
+		cdr.maxDate = x[i].r;
+
+		if (x[i].r < cdr.minDate)
+		cdr.minDate = x[i].r;
+	}
+};
+
 cdr.formatData = () => {
 	cdr.tbodyDOM = $('<tbody>');
 
 	cdr.dataDOM.
 	empty().
+	append($('<div>').
 	append($('<div>').attr('id', 'total').text(cdr.data.length)).
+	append($('<div>').attr('id', 'minDate').text(cdr.datetime(cdr.minDate))).
+	append($('<div>').attr('id', 'maxDate').text(cdr.datetime(cdr.maxDate)))).
 	append($('<table border="yes">').
 	append($('<thead>').
 	append($('<tr>').

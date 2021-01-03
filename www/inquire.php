@@ -125,6 +125,7 @@ cdr.formatData = (x) => {
 	append($('<th>').text('Origination')).
 	append($('<th>').text('Connect')).
 	append($('<th>').text('Disconnect')).
+	append($('<th>').text('Duration')).
 	append($('<th>').text('Hunt')))).
 	append(dom));
 
@@ -140,13 +141,19 @@ cdr.formatDataPart = (x, n, dom) => {
 		if (count++ >= orio)
 		break;
 
+		let dur = x[i].b ? x[i].e - x[i].b : '';
+		let origination = cdr.datetime(x[i].r);
+		let connect = cdr.datetime(x[i].b);
+		let disconnect = cdr.datetime(x[i].e);
+
 		dom.append($('<tr>').
 		append($('<td>').text(x[i].c)).
 		append($('<td>').text(x[i].o)).
 		append($('<td>').text(x[i].f)).
-		append($('<td>').text(x[i].r)).
-		append($('<td>').text(x[i].b)).
-		append($('<td>').text(x[i].e)).
+		append($('<td>').text(origination)).
+		append($('<td>').text(connect)).
+		append($('<td>').text(disconnect)).
+		append($('<td>').text(dur)).
 		append($('<td>').text(x[i].h)));
 
 		if (i >= cdr.orio) {
@@ -165,6 +172,38 @@ cdr.formatDataPart = (x, n, dom) => {
 	cdr.timer = setTimeout(() => {
 		cdr.formatDataPart(x, i, dom);
 	}, 0);
+};
+
+cdr.datetime = (t) => {
+	if (!t)
+	return '';
+
+	let d = new Date(t * 1000);
+
+	let x = d.getDate();
+	if (x < 10) x = '0' + x;
+	t = x;
+
+	x = d.getMonth() + 1;
+	if (x < 10) x = '0' + x;
+	t += '-' + x;
+
+	x = d.getFullYear();
+	t += '-' + x;
+
+	x = d.getHours();
+	if (x < 10) x = '0' + x;
+	t += ' ' + x;
+
+	x = d.getMinutes();
+	if (x < 10) x = '0' + x;
+	t += ':' + x;
+
+	x = d.getSeconds();
+	if (x < 10) x = '0' + x;
+	t += ':' + x;
+
+	return t;
 };
 </script>
 </head>

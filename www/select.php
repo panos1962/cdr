@@ -12,12 +12,12 @@ database_connection_error();
 apo_eos();
 
 $query = "SELECT ";
-$query .= "`dateTimeOrigination`, ";
+$query .= "UNIX_TIMESTAMP(`dateTimeOrigination`), ";
 $query .= "`callingPartyNumber`, ";
 $query .= "`originalCalledPartyNumber`, ";
 $query .= "`finalCalledPartyNumber`, ";
-$query .= "`dateTimeConnect`, ";
-$query .= "`dateTimeDisconnect`, ";
+$query .= "UNIX_TIMESTAMP(`dateTimeConnect`), ";
+$query .= "UNIX_TIMESTAMP(`dateTimeDisconnect`), ";
 $query .= "`origIpAddr`, ";
 $query .= "`destIpAddr`, ";
 $query .= "`huntPilotPattern` ";

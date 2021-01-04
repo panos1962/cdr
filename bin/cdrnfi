@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+
+progname=$(basename $0)
+
+usage() {
+	echo "usage: ${progname} [-m minutes] [-v]"
+	exit 1
+}
+
+[ -z "${CDR_BASEDIR}" ] && CDR_BASEDIR="/var/opt/cdr"
+conf="${CDR_BASEDIR}/local/nfi.conf"
+
+if [ -r "${conf}" ]
+then
+	. "${conf}"
+else
+	incomingdir="/backup/incoming_cdrs"
+	maincdrdir="/backup/CDR_files"
+	maincmrdir="/backup/CMR_files"
+fi
+
+err=
+
+for i in "${incomingdir}" "${maincdrdir}" "${maincmrdir}"
+do
+	[ -d "${i}" ] || {
+		echo "${progname}: ${i}: directory not found" >&2
+		err=1
+	}
+done
+
+for i in "${incomingdir}" "${maincdrdir}" "${maincmrdir}"
+do
+	[ -r "${i}" ] || {
+		echo "${progname}: ${i}: cannot read" >&2
+		err=1
+	}
+done
+
+unset i
+
+tratock() {
+	local t
+
+	[ $# -ne 1 ] && return 1
+
+	if [ "$1" == "0" ]; then
+		trato=0
+		return 0
+	fi
+
+	trato="$(expr "$1" + 0 2>/dev/null)" || return 1
+	[ "${trato}" -ne "$1" ] && return 1
+	[ "${trato}" -lt 0 ] && return 1
+	return 0
+}
+
+err=
+trato=5
+verbose=
+
+while getopts ":m:v" opt
+do
+	case "${opt}" in
+	m)
+		tratock "${OPTARG}" || {
+			echo "${progname}: ${OPTARG}: invalid offset minutes" >&2
+			err=1
+		}
+		;;
+	v)
+		verbose=1
+		;;
+	\?)
+		echo "${progname}: -${OPTARG}: invalid option" >&2
+		err=1
+		;;
+	esac
+done
+
+[ -n "${err}" ] && usage
+
+shift $(expr ${OPTIND} - 1)
+
+[ $# -ne 0 ] && usage
+
+find "${incomingdir}" -type f -a -mmin "+${trato}" -print | awk \
+-v "progname=${progname}" \
+-v "cdr_basedir=${CDR_BASEDIR}" \
+-v "maincdrdir=${maincdrdir}" \
+-v "maincmrdir=${maincmrdir}" \
+-v "verbose=${verbose}" \
+-f "${CDR_BASEDIR}/lib/cdrnfi.awk"

@@ -1,5 +1,49 @@
 #!/usr/bin/env bash
 
+# Το παρόν πρόγραμμα χρησιμοποιείται για τη διαχείριση των εισερχομένων
+# αρχείων CDR και CMR που αποστέλλει ο CUCM στον server υποδοχής, όπου
+# εξάλλου πρέπει να εκτελείται το παρόν.
+#
+# Το πρόγραμμα διαβάζει τα files που εντοπίζει στο directory υποδοχής και
+# αφού φορτώσει τα CDRs στην database, μετακινεί τα files στη μόνιμη θέση
+# τους, τουτέστιν σε directory structures οργανωμένες κατά έτος και μήνα.
+# Μιλάμε για directory structrures (πληθυντικός) και όχι structure καθώς
+# το πρόγραμμα διαχειρίζεται τόσο τα CDR files όσο και τα CMR files. Τα
+# δεδομένα των CDR files φορτώονονται στην database και κατόπιν τα files
+# μετακινούνται στη σωστή τους θέση, ενώ τα CMR files μετακινούνται άμεσα
+# χωρίς να φορτώνονται δεδομένα στην database.
+#
+# Για να αποφύγουμε δυσάρεστες καταστάσεις διαχείρισης αρχείων τα οποία
+# βρίσκονται ακόμη σε στάδιο υποδοχής, φροντίζουμε να αφήσουμε ένα μικρό
+# χρονικό περιθώριο (default 5 minutes) στα αρχεία που διαχειριζόμαστε,
+# ωστόσο το όριο αυτό μπορεί να αλλάξει με την option -m του προγράμματος.
+#
+# Παρέχεται επίσης η option -v (verbose) με την οποία το πρόγραμμα τυπώνει
+# στο standard output τα ονόματα των αρχείων τα οποία διαχειρίστηκε επιτυχώς.
+#
+# Configuration
+# -------------
+# Τα ονόματα των directories υποδοχής των αρχείων και τα ονόματα των
+# directories μόνιμης μετακίνησης των αρχείων δίνονται σε configuration
+# file με το όνομα "nfi.conf" το οποίο πρέπει να υπάρχει στο directory
+# "local" της εφαρμογής. Ακολουθεί παράδειγμα ενός τέτοιυ αρχείου:
+#
+#	incomingdir="/backup/incoming_cdrs"
+#	maincdrdir="/backup/CDR_files"
+#	maincmrdir="/backup/CMR_files"
+#
+# Ουσιαστικά πρόκειται για bash snippet στο οποίο ορίζονται οι μεταβλητές
+# "incomingdir", "maincdrdir" και "maincmrdir" οι οποίες αφορούν αντίστοιχα
+# στο directory υποδοχής των CDR/CMR files, στο directory μόνιμης αποθήκευσης
+# των CDR files και στο directory μόνιμης αποθήκευσης των CMR files.
+#
+# XXX ΣΗΜΑΝΤΙΚΟ XXX
+# -----------------
+# Για να φορτωθούν τα CDRs στην database είναι απαραίτητο να υπάρχει το
+# password του λογαριασμού "cucmadm" της database στην enviroment variable
+# "CDR_DBPASS".
+
+
 progname=$(basename $0)
 
 usage() {
@@ -7,7 +51,14 @@ usage() {
 	exit 1
 }
 
+# Πρώτα ελέγχουμε την enviroment variable που δείχνει το directory βάσης της
+# εφαρμογής "cdr" το οποίο by default είναι το "/var/opt/cdr".
+
 [ -z "${CDR_BASEDIR}" ] && CDR_BASEDIR="/var/opt/cdr"
+
+# Ελέγχουμε το configuration file όπου καθορίζονται τα directories υποδοχής
+# και μόνιμης αποθήκευσης των αρχείων CDR/CMR που αποστέλλει ο CUCM.
+
 conf="${CDR_BASEDIR}/local/nfi.conf"
 
 if [ -r "${conf}" ]
@@ -21,6 +72,9 @@ fi
 
 err=
 
+# Ελέγχουμε αν τα συγκεκριμένα diretories υπάρχουν και αν έχουμε τις
+# απαραίτητες προσβάσεις σε αυτά.
+
 for i in "${incomingdir}" "${maincdrdir}" "${maincmrdir}"
 do
 	[ -d "${i}" ] || {
@@ -29,15 +83,30 @@ do
 	}
 done
 
+[ -n "${err}" ] && exit 2
+
 for i in "${incomingdir}" "${maincdrdir}" "${maincmrdir}"
 do
 	[ -r "${i}" ] || {
 		echo "${progname}: ${i}: cannot read" >&2
 		err=1
 	}
+
+	[ -r "${i}" ] || {
+		echo "${progname}: ${i}: cannot write" >&2
+		err=1
+	}
 done
 
+[ -n "${err}" ] && exit 2
+
 unset i
+unset err
+
+# Η function "tratock" ελέγχει την παράμετρο της option -m με την οποία
+# καθορίζουμε το χρονικό διάστημα πριν από το οποίο τα αρχεία θεωρούνται
+# ασφαλή για φόρτωμα και μετακίνηση. Το διάστημα αυτό καθορίζεται σε λεπτά
+# της ώρας και είναι 5 by default.
 
 tratock() {
 	local t
@@ -81,7 +150,6 @@ done
 [ -n "${err}" ] && usage
 
 shift $(expr ${OPTIND} - 1)
-
 [ $# -ne 0 ] && usage
 
 find "${incomingdir}" -type f -a -mmin "+${trato}" -print | awk \

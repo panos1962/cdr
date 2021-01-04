@@ -37,7 +37,7 @@ thead {
 	width: 14ex;
 }
 .button {
-	margin-left: 16px;
+	margin-right: 16px;
 	cursor: pointer;
 }
 .busy {
@@ -102,6 +102,7 @@ thead {
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
 "use strict";
+
 const cdr = {};
 
 $(document.body).ready(() => {
@@ -535,12 +536,13 @@ cdr.busySet = (onOff) => {
 <input id="imerominia" type="date">
 <label for="meres">Days</label>
 <input id="meres" type="number">
-<label for="orio">Limit</label>
-<input id="orio" value="1000" type="number" step="1000" min="1000">
+<input class="button" id="logout" type="button" value="Logout">
+<hr>
 
 <input class="button" id="submit" type="submit" value="Submit">
 <input class="button" id="clear" type="button" value="Clear">
-<input class="button" id="logout" type="button" value="Logout">
+<label for="orio" style="font-style: italic;">Limit</label>
+<input id="orio" value="1000" type="number" step="1000" min="1000">
 </form>
 <div id="data">
 </div>

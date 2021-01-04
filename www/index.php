@@ -13,7 +13,9 @@ if (@$_SESSION["dbpass"]) {
 <link rel="icon" type="image/png" href="images/cdr.png">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
-cdr = {};
+"use strict";
+
+const cdr = {};
 
 $(document.body).ready(() => {
 	cdr.passDOM = $('#pass').focus();

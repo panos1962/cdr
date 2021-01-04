@@ -12,6 +12,24 @@ if (!$_SESSION["dbpass"]) {
 <title>CDR-Inquire</title>
 <link rel="icon" type="image/png" href="images/cdr.png">
 <style>
+table, th, td {
+  border-collapse: collapse;
+}
+tbody.overflow tr:nth-of-type(odd) {
+	background-color: #ffe3d5;
+}
+tbody.overflow tr:nth-of-type(even) {
+	background-color: #ffe9de;
+}
+tbody.data tr:nth-of-type(odd) {
+	background-color: #ffffdd;
+}
+tbody.data tr:nth-of-type(even) {
+	background-color: #ffffc4;
+}
+thead {
+	border-bottom: double;
+}
 #logout {
 	float: right;
 }
@@ -34,12 +52,6 @@ if (!$_SESSION["dbpass"]) {
 }
 #orio {
 	width: 10ex;
-}
-.data {
-	background-color: #FFFFDD;
-}
-.overflow {
-	background-color: #FFDEDE;
 }
 .sortable {
 	user-select: none;
@@ -229,7 +241,7 @@ cdr.formatData = () => {
 	cdr.dataDOM.
 	empty().
 	append(metaDOM).
-	append($('<table border="yes">').
+	append($('<table border="yes" >').
 	append($('<thead>').
 	append($('<tr>').
 	append($('<th>').text('#').
@@ -418,7 +430,8 @@ cdr.formatDataPart = (n) => {
 		append($('<td>').text(x[i].h)));
 
 		if (i >= cdr.orio) {
-			cdr.tbodyDOM.addClass('overflow');
+			cdr.
+			tbodyDOM.addClass('overflow');
 			delete cdr.timer;
 			cdr.busySet(false);
 			return;

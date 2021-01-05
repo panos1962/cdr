@@ -30,6 +30,9 @@ $query .= "AND `callingPartyNumber` LIKE '" . $db->real_escape_string($_POST["ca
 if ($_POST["called"])
 $query .= "AND `originalCalledPartyNumber` LIKE '" . $db->real_escape_string($_POST["called"]) . "' ";
 
+if ($_POST["final"])
+$query .= "AND `finalCalledPartyNumber` LIKE '" . $db->real_escape_string($_POST["final"]) . "' ";
+
 if ($apo)
 $query .= "AND `dateTimeOrigination` >= '" . $apo . " 00:00:00' ";
 

@@ -4,14 +4,13 @@
 # By default απλώς διαβάζει τα CDRs και εκτυπώνει τα πεδία που μας ενδιαφέρουν
 # στο standard output. Αν επιθυμούμε εισαγωγή των στοιχείων στην database, θα
 # πρέπει να χρησιμοποιήσουμε είτε την option -i (insert) είτε την option -r
-# (replace). Παρέχεται, ακόμη, και η option -m με την οποία εκτυπώνονται
-# εκτυπώνονται μηνύματα προόδου στο standard output. Αν δεν δοθούν options
-# εισαγωγής ή ενημέρωσης των CDRs στην database, τότε το πρόγραμμα τρέχει
-# σε mode ελέγχου και εκτυπώνει τα CDRs στο standard output· σε αυτή την
-# περίπτωση μπορούμε να περιοριστούμε στον έλεγχο των CDRs αποφεύγοντας
-# την εκτύπωση των δεδομένων κάνοντας χρήση της option -c.
+# (replace).
+# Αν δεν δοθούν options εισαγωγής ή ενημέρωσης των CDRs στην database, τότε το
+# πρόγραμμα τρέχει σε mode ελέγχου και εκτυπώνει τα CDRs στο standard output·
+# σε αυτή την περίπτωση μπορούμε να περιοριστούμε απλώς στον έλεγχο των CDRs,
+# αποφεύγοντας την εκτύπωση των δεδομένων, κάνοντας χρήση της option -c.
 #
-# Τέλος, παρέχεται η option -m με την οποία εκτυπώνονται μηνύματα προόδου
+# Τέλος, παρέχεται η option -v με την οποία εκτυπώνονται μηνύματα προόδου
 # των εργασιών, καθώς επίσης και τελικά στατιστικά.
 
 progname=$(basename $0)
@@ -20,16 +19,16 @@ progname=$(basename $0)
 export CDR_BASEDIR="/var/opt/cdr"
 
 usage() {
-	echo "usage: ${progname} [-i] [-r] files..."
+	echo "usage: ${progname} [-i] [-r] [-c] [-v] files..."
 	exit 1
 }
 
 err=
 dbmode=
 check=
-monitor=
+verbose=
 
-while getopts ":cirm" opt
+while getopts ":cirv" opt
 do
 	case "${opt}" in
 
@@ -60,10 +59,10 @@ do
 		dbmode="replace"
 		;;
 
-	# Με την option -m εκτυπώνονται μηνύματα προόδου των εργασιών
+	# Με την option -v εκτυπώνονται μηνύματα προόδου των εργασιών
 	# και συνολικά μηνύματα στο τέλος κάθε awk session.
-	m)
-		monitor="yes"
+	v)
+		verbose="yes"
 		;;
 
 	\?)
@@ -85,7 +84,7 @@ awkcmd="awk "
 awkcmd="${awkcmd} -v cdr_progname=${progname}"
 awkcmd="${awkcmd} -v dbmode=${dbmode}"
 awkcmd="${awkcmd} -v check=${check} "
-awkcmd="${awkcmd} -v monitor=${monitor} "
+awkcmd="${awkcmd} -v verbose=${verbose} "
 awkcmd="${awkcmd} -l ${CDR_BASEDIR}/lib/cdrawk.so"
 awkcmd="${awkcmd} -l spawk"
 awkcmd="${awkcmd} -f ${CDR_BASEDIR}/lib/cdr.awk"

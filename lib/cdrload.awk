@@ -90,14 +90,14 @@ BEGIN {
 	@process()
 	processed++
 
-	if (monitor && ((processed % 1000) == 0)) {
+	if (verbose && ((processed % 1000) == 0)) {
 		printf "%d rows processed\n", processed
 		fflush()
 	}
 }
 
 END {
-	if (monitor)
+	if (verbose)
 	printf "%d total rows processed, total %d rows rejected\n", \
 		totalrows, rejected
 	exit(0)

@@ -14,13 +14,24 @@
 BEGIN {
 	FS = ","
 	cdr_parse_init()
+	delete cdr_valid_input_files[""]
+	delete cdr_invalid_input_files[""]
 }
 
-{
-	if (cdr_invalid_record_type())
-	next
+# Το πρόγραμμα διαβάζει μόνο αρχεία που έχουν αποσταλεί από τον CUCM και
+# μάλιστα απευθείας από τα αρχεία αυτά και όχι με redirection. Ως εκ τούτου
+# ελέγχονται κατ' αρχάς τα ονόματα των input files τα οποία πρέπει να είναι
+# της μορφής "cdr_StandAloneCluster_0[12]_2[0-9]{11}_[0-9]+".
 
-	if (cdr_unaccepted_columns_count())
+cdr_invalid_cdrfname() {
+	next
+}
+
+cdr_invalid_record_type() {
+	next
+}
+
+cdr_unaccepted_columns_count() {
 	next
 }
 
@@ -36,6 +47,25 @@ BEGIN {
 
 	if (cdr_fixcolvals())
 	next
+}
+
+function cdr_invalid_cdrfname(			n, a) {
+	if (FILENAME in cdr_valid_input_files)
+	return 0
+
+	if (FILENAME in cdr_invalid_input_files)
+	return 1
+
+	n = split(FILENAME, a, "/")
+
+	if (cdr_validfname(a[n], "cdr")) {
+		cdr_valid_input_files[FILENAME]
+		return 0
+	}
+
+	cdr_error(FILENAME ": invalid input file name")
+	cdr_invalid_input_files[FILENAME]
+	return 1
 }
 
 # Τα CDRs έχουν στην πρώτη στήλη τον αριθμό 1, επομένως κάθε record που δεν

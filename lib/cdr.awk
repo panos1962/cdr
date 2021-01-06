@@ -58,10 +58,11 @@ BEGIN {
 	cdr_fnamepat = "_StandAloneCluster_0[12]_2[0-9]{11}_[0-9]+$"
 }
 
-function cdr_validfname(fname, tipos) {
-	if (!tipos)
-	tipos = "c[md]r"
+# Η function "cdr_validfname" δέχεται το basename ενός αρχείου και εξετάζει
+# αν ταιριάζει με το pattern των αρχείων που αποστέλλει ο CUCM. Ως δεύτερη
+# παράμετρο περνάμε "cdr" ή "cmr" για τα CDR ή τα CMR files αντίστοιχα.
 
+function cdr_validfname(fname, tipos) {
 	return (fname ~ ("^" tipos cdr_fnamepat))
 }
 

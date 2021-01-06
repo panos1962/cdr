@@ -5,7 +5,7 @@ BEGIN {
 	dbload = cdr_basedir "/bin/cdrload -r "
 }
 
-cdr_invalidfname($NF) {
+cdr_invalidfname($NF, "c[dm]r") {
 	next
 }
 

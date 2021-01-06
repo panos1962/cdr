@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
-# Το παρόν πρόγραμμα χρησιμοποιείται για τη διαχείριση των εισερχομένων
-# αρχείων CDR και CMR που αποστέλλει ο CUCM στον server υποδοχής, όπου
-# εξάλλου πρέπει να εκτελείται το παρόν.
+# New Files Installer (nfi)
+# -------------------------
+# Το παρόν πρόγραμμα χρησιμοποιείται για τη διαχείριση και την αποθήκευση
+# των εισερχομένων αρχείων CDR και CMR που αποστέλλει ο CUCM στον server
+# υποδοχής, όπου εξάλλου πρέπει να εκτελείται το παρόν.
 #
 # Το πρόγραμμα διαβάζει τα files που εντοπίζει στο directory υποδοχής και
 # αφού φορτώσει τα CDRs στην database, μετακινεί τα files στη μόνιμη θέση
@@ -158,4 +160,5 @@ find "${incomingdir}" -type f -a -mmin "+${trato}" -print | awk \
 -v "maincdrdir=${maincdrdir}" \
 -v "maincmrdir=${maincmrdir}" \
 -v "verbose=${verbose}" \
+-i "${CDR_BASEDIR}/lib/cdr.awk" \
 -f "${CDR_BASEDIR}/lib/cdrnfi.awk"

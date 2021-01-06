@@ -5,7 +5,7 @@ BEGIN {
 	dbload = cdr_basedir "/bin/cdrload -r "
 }
 
-$NF !~ /^c[md]r_StandAloneCluster_0[12]_2[0-9]{11}_[0-9]+$/ {
+cdr_invalidfname($NF) {
 	next
 }
 

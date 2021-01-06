@@ -36,6 +36,37 @@ BEGIN {
 
 	if (!(cdr_basedir = ENVIRON["CDR_BASEDIR"]))
 	cdr_basedir = "/var/opt/cdr"
+
+	# Η global μεταβλητή "cdr_fnamepat" περιέχει το file name pattern
+	# που ταιριάζει με τα ονόματα των εισερχομένων CDR/CMR files, ως
+	# regular expression. Ακολουθούν ορισμένα παραδείγματα ονομάτων
+	# εισερχομένων αρχείων:
+	#
+	# CDR files
+	# ---------
+	# cdr_StandAloneCluster_02_202012260557_476630
+	# cdr_StandAloneCluster_01_202012260558_476631
+	# cdr_StandAloneCluster_02_202012260936_476745
+	#
+	# CMR files
+	# ---------
+	# cmr_StandAloneCluster_01_202012260632_476659
+	# cmr_StandAloneCluster_02_202012260642_476662
+	# cmr_StandAloneCluster_01_202012260844_476716
+
+
+	cdr_fnamepat = "_StandAloneCluster_0[12]_2[0-9]{11}_[0-9]+$"
+}
+
+function cdr_validfname(fname, tipos) {
+	if (!tipos)
+	tipos = "c[md]r"
+
+	return (fname ~ ("^" tipos cdr_fnamepat))
+}
+
+function cdr_invalidfname(fname, tipos) {
+	return !cdr_validfname(fname, tipos)
 }
 
 # Η function "cdr_humantime" δέχεται ως παράμετρο ένα timestamp και επιστρέφει

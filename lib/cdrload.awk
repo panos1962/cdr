@@ -120,8 +120,8 @@ function cdr_checkfile(			n, a) {
 	
 	skipfile = 1
 
-	if (curfile !~ /^cdr_StandAloneCluster_0[12]_2[0-9]{11}_[0-9]+$/)
-	return cdr_error(FILENAME ": bad file name")
+	if (cdr_invalidfname(curfile, "cdr"))
+	return cdr_error(FILENAME ": invalid file name")
 
 	spawk_submit("SELECT MD5('" curfile "')")
 

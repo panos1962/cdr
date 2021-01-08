@@ -22,10 +22,12 @@ $query .= "`origIpAddr`, ";
 $query .= "`destIpAddr`, ";
 $query .= "`huntPilotPattern` ";
 
-$query .= "FROM `cdr` WHERE 1 = 1 ";
+$query .= "FROM `cdr` ";
 
 if ($apo)
 $query .= "USE INDEX (`dateTimeOrigination`) ";
+
+$query .= "WHERE 1 = 1 ";
 
 if ($_POST["calling"])
 $query .= "AND `callingPartyNumber` LIKE '" . $db->real_escape_string($_POST["calling"]) . "' ";

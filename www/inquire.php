@@ -115,6 +115,18 @@ $(document.body).ready(() => {
 	cdr.submitDOM = $('#submit');
 	cdr.submitDOM = $('#submit');
 
+	$('#simera').
+	on('click', (e) => {
+		let d = new Date();
+		cdr.imerominiaDOM.val(d.getFullYear() + '-' +
+			String(d.getMonth() + 1).padStart(2, '0') + '-' +
+			String(d.getDate()).padStart(2, '0'));
+	});
+	cdr.pantaDOM = $('#panta').
+	on('click', (e) => {
+		cdr.imerominiaDOM.val('');
+	});
+
 	$('#clear').
 	on('click', () => {
 		cdr.callingDOM.val('');
@@ -457,27 +469,22 @@ cdr.datetime = (t) => {
 
 	let d = new Date(t * 1000);
 
-	let x = d.getDate();
-	if (x < 10) x = '0' + x;
+	let x = String(d.getDate()).padStart(2, '0');
 	t = x;
 
-	x = d.getMonth() + 1;
-	if (x < 10) x = '0' + x;
+	x = String(d.getMonth() + 1).padStart(2, '0');
 	t += '-' + x;
 
 	x = d.getFullYear();
 	t += '-' + x;
 
-	x = d.getHours();
-	if (x < 10) x = '0' + x;
+	x = String(d.getHours()).padStart(2, '0');
 	t += ' ' + x;
 
-	x = d.getMinutes();
-	if (x < 10) x = '0' + x;
+	x = String(d.getMinutes()).padStart(2, '0');
 	t += ':' + x;
 
-	x = d.getSeconds();
-	if (x < 10) x = '0' + x;
+	x = String(d.getSeconds()).padStart(2, '0');
 	t += ':' + x;
 
 	return t;
@@ -541,6 +548,9 @@ cdr.busySet = (onOff) => {
 
 <input class="button" id="submit" type="submit" value="Submit">
 <input class="button" id="clear" type="button" value="Clear">
+<input class="button" id="simera" type="button" value="Today">
+<input class="button" id="panta" type="button" value="Ever">
+
 <label for="orio" style="font-style: italic;">Limit</label>
 <input id="orio" value="1000" type="number" step="1000" min="1000">
 </form>

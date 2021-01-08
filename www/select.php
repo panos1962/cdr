@@ -27,22 +27,22 @@ $query .= "FROM `cdr` ";
 if ($apo)
 $query .= "USE INDEX (`dateTimeOrigination`) ";
 
-$query .= "WHERE 1 = 1 ";
+$where = "WHERE";
 
 if ($_POST["calling"])
-$query .= "AND `callingPartyNumber` LIKE '" . $db->real_escape_string($_POST["calling"]) . "' ";
+where_push("`callingPartyNumber` LIKE '" . $db->real_escape_string($_POST["calling"]) . "'");
 
 if ($_POST["called"])
-$query .= "AND `originalCalledPartyNumber` LIKE '" . $db->real_escape_string($_POST["called"]) . "' ";
+where_push("`originalCalledPartyNumber` LIKE '" . $db->real_escape_string($_POST["called"]) . "'");
 
 if ($_POST["final"])
-$query .= "AND `finalCalledPartyNumber` LIKE '" . $db->real_escape_string($_POST["final"]) . "' ";
+where_push("`finalCalledPartyNumber` LIKE '" . $db->real_escape_string($_POST["final"]) . "'");
 
 if ($apo)
-$query .= "AND `dateTimeOrigination` >= '" . $apo . " 00:00:00' ";
+where_push("`dateTimeOrigination` >= '" . $apo . " 00:00:00'");
 
 if ($eos)
-$query .= "AND `dateTimeOrigination` < '" . $eos . " 00:00:00' ";
+where_push("`dateTimeOrigination` < '" . $eos . " 00:00:00'");
 
 $query .= "ORDER BY `dateTimeOrigination` ";
 
@@ -76,6 +76,14 @@ print ']}';
 
 $res->close();
 $db->close();
+
+function where_push($cond) {
+	global $query;
+	global $where;
+
+	$query .= $where . " " . $cond . " ";
+	$where = "AND";
+}
 
 function apo_eos() {
 	global $db;

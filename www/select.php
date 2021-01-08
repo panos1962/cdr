@@ -24,6 +24,9 @@ $query .= "`huntPilotPattern` ";
 
 $query .= "FROM `cdr` WHERE 1 = 1 ";
 
+if ($apo)
+$query .= "USE INDEX (`dateTimeOrigination`) ";
+
 if ($_POST["calling"])
 $query .= "AND `callingPartyNumber` LIKE '" . $db->real_escape_string($_POST["calling"]) . "' ";
 
@@ -38,9 +41,6 @@ $query .= "AND `dateTimeOrigination` >= '" . $apo . " 00:00:00' ";
 
 if ($eos)
 $query .= "AND `dateTimeOrigination` < '" . $eos . " 00:00:00' ";
-
-if ($apo)
-$query .= "USE INDEX (`dateTimeOrigination`) ";
 
 $query .= "ORDER BY `dateTimeOrigination` ";
 

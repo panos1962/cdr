@@ -71,6 +71,11 @@ BEGIN {
 	rejected = 0
 	processed = 0
 
+	# Το πρόγραμμα «τρέχει» είτε σε update mode είτε σε print mode· αυτό
+	# καθορίζεται με option από το command line και περνά στο παρόν μέσω
+	# της μεταβλητής "dbmode". Η function η οποία εκτελείται τελικά για
+	# κάθε CDR είναι αντίστοιχα η "cdr_dbload" ή "cdr_print".
+
 	process = "cdr_" (dbmode ? "dbload" : "print")
 }
 
@@ -191,6 +196,9 @@ function cdr_checkfile(			n, a) {
 	skipfile = 0
 }
 
+# Η function "cdr_dbload" χρησιμοποιείται για την εισαγωγή/ενημέρωση των CDRs
+# στην database.
+
 function cdr_dbload(mode,			a, query) {
 	query = "INSERT INTO `cdr` (" \
 		"`arxio`, " \
@@ -233,6 +241,8 @@ function cdr_dbload(mode,			a, query) {
 
 	return 0
 }
+
+# Η function "cdr_print" χρησιμοποιείται για απλή εκτύπωση των CDRs.
 
 function cdr_print() {
 	if (check)

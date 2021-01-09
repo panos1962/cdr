@@ -107,7 +107,10 @@ thead {
 #dateOps {
 	display: inline-block;
 	padding: 4px 8px;
-	background-color: #E9E9E9;
+	background-color: #FBFBFB;
+	border-style: dotted;
+	border-width: 1px;
+	border-color: #C3C3C3;
 	border-radius: 4px;
 }
 #dateOps .button {
@@ -138,7 +141,11 @@ ready(function() {
 		cdr.dtlockDOM.data('date', $(this).val());
 		cdr.dtlockRefresh();
 	});
-	cdr.meresDOM = $('#meres');
+	cdr.meresDOM = $('#meres').
+	on('change', function() {
+		cdr.dtlockDOM.data('meres', $(this).val());
+		cdr.dtlockRefresh();
+	});
 	cdr.orioDOM = $('#orio');
 	cdr.submitDOM = $('#submit');
 	cdr.submitDOM = $('#submit');
@@ -156,6 +163,7 @@ ready(function() {
 	cdr.pantaDOM = $('#panta').
 	on('click', (e) => {
 		cdr.imerominiaDOM.val('');
+		cdr.meresDOM.val('');
 		cdr.dateUnlock();
 		cdr.dtlockRefresh();
 	});
@@ -164,6 +172,7 @@ ready(function() {
 	on('click', function(e) {
 		if ($(this).data('locked')) {
 			cdr.imerominiaDOM.val('');
+			cdr.meresDOM.val('');
 			cdr.dateUnlock();
 			return;
 		}
@@ -174,15 +183,19 @@ ready(function() {
 	cdr.clearDOM = $('#clear').
 	on('click', () => {
 		let d;
+		let m;
 
-		if (cdr.dtlockDOM.data('locked'))
-		d = cdr.dtlockDOM.data('date');
+		if (cdr.dtlockDOM.data('locked')) {
+			d = cdr.dtlockDOM.data('date');
+			m = cdr.dtlockDOM.data('meres');
+		}
 
 		cdr.callingDOM.val('').focus();
 		cdr.calledDOM.val('');
 		cdr.finalDOM.val('');
 		cdr.imerominiaDOM.val(d);
-		cdr.meresDOM.val('');
+		cdr.orioDOM.val();
+		cdr.meresDOM.val(m);
 	});
 
 	$('#logout').
@@ -205,12 +218,13 @@ ready(function() {
 });
 
 cdr.dateLock = () => {
-	let d = cdr.imerominiaDOM.val();
+	let x = cdr.imerominiaDOM.val();
 
-	if (!d)
+	if (!x)
 	return;
 
-	cdr.dtlockDOM.data('date', d);
+	cdr.dtlockDOM.data('date', x);
+	cdr.dtlockDOM.data('meres', cdr.meresDOM.val());
 	cdr.dtlockDOM.data('locked', true).addClass('dateLocked').prop('value', 'Unlock');
 };
 

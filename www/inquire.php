@@ -136,6 +136,7 @@ ready(function() {
 	cdr.imerominiaDOM = $('#imerominia').
 	on('change', function() {
 		cdr.dtlockDOM.data('date', $(this).val());
+		cdr.dtlockRefresh();
 	});
 	cdr.meresDOM = $('#meres');
 	cdr.orioDOM = $('#orio');
@@ -149,12 +150,14 @@ ready(function() {
 			String(d.getMonth() + 1).padStart(2, '0') + '-' +
 			String(d.getDate()).padStart(2, '0'));
 		cdr.dateUnlock();
+		cdr.dtlockRefresh();
 	});
 
 	cdr.pantaDOM = $('#panta').
 	on('click', (e) => {
 		cdr.imerominiaDOM.val('');
 		cdr.dateUnlock();
+		cdr.dtlockRefresh();
 	});
 
 	cdr.dtlockDOM = $('#dtlock').
@@ -213,6 +216,13 @@ cdr.dateLock = () => {
 
 cdr.dateUnlock = () => {
 	cdr.dtlockDOM.removeData('locked').removeClass('dateLocked').prop('value', 'Lock');
+	cdr.dtlockDOM.prop('disabled', !cdr.imerominiaDOM.val());
+	return;
+};
+
+cdr.dtlockRefresh = () => {
+	let d = cdr.imerominiaDOM.val();
+	cdr.dtlockDOM.prop('disabled', !d);
 	return;
 };
 
@@ -609,10 +619,10 @@ cdr.busySet = (onOff) => {
 
 <input class="button" id="submit" type="submit" value="Submit">
 <input class="button" id="clear" type="button" value="Clear">
-<div id="dateOps">
+<div id="dateOps" title="Date utils">
 <input class="button" id="simera" type="button" value="Today">
 <input class="button" id="panta" type="button" value="Ever">
-<input class="button" id="dtlock" type="button" value="Lock">
+<input class="button" id="dtlock" type="button" value="Lock" disabled="yes">
 </div>
 
 <label for="orio" style="font-style: italic;">Limit</label>

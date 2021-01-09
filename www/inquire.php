@@ -98,6 +98,21 @@ thead {
 	margin-left: 4px;
 	color: gray;
 }
+#dtlock {
+	width: 10ex;
+}
+.dateLocked {
+	color: red;
+}
+#dateOps {
+	display: inline-block;
+	padding: 4px 8px;
+	background-color: #E9E9E9;
+	border-radius: 4px;
+}
+#dateOps .button {
+	margin: 4px;
+}
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
@@ -105,11 +120,23 @@ thead {
 
 const cdr = {};
 
-$(document.body).ready(() => {
+$(document.body).
+ready(function() {
+	$(this).on('keydown', (e) => {
+		if (e.which !== 27)
+		return;
+
+		e.stopPropagation();
+		cdr.clearDOM.trigger('click');
+	});
+
 	cdr.callingDOM = $('#calling').focus();
 	cdr.calledDOM = $('#called');
 	cdr.finalDOM = $('#final');
-	cdr.imerominiaDOM = $('#imerominia');
+	cdr.imerominiaDOM = $('#imerominia').
+	on('change', function() {
+		cdr.dtlockDOM.data('date', $(this).val());
+	});
 	cdr.meresDOM = $('#meres');
 	cdr.orioDOM = $('#orio');
 	cdr.submitDOM = $('#submit');
@@ -121,18 +148,37 @@ $(document.body).ready(() => {
 		cdr.imerominiaDOM.val(d.getFullYear() + '-' +
 			String(d.getMonth() + 1).padStart(2, '0') + '-' +
 			String(d.getDate()).padStart(2, '0'));
+		cdr.dateUnlock();
 	});
+
 	cdr.pantaDOM = $('#panta').
 	on('click', (e) => {
 		cdr.imerominiaDOM.val('');
+		cdr.dateUnlock();
 	});
 
-	$('#clear').
+	cdr.dtlockDOM = $('#dtlock').
+	on('click', function(e) {
+		if ($(this).data('locked')) {
+			cdr.imerominiaDOM.val('');
+			cdr.dateUnlock();
+			return;
+		}
+
+		cdr.dateLock();
+	});
+
+	cdr.clearDOM = $('#clear').
 	on('click', () => {
-		cdr.callingDOM.val('');
+		let d;
+
+		if (cdr.dtlockDOM.data('locked'))
+		d = cdr.dtlockDOM.data('date');
+
+		cdr.callingDOM.val('').focus();
 		cdr.calledDOM.val('');
 		cdr.finalDOM.val('');
-		cdr.imerominiaDOM.val('');
+		cdr.imerominiaDOM.val(d);
 		cdr.meresDOM.val('');
 	});
 
@@ -154,6 +200,21 @@ $(document.body).ready(() => {
 	cdr.formaDOM = $('#forma').
 	on('submit', cdr.submit);
 });
+
+cdr.dateLock = () => {
+	let d = cdr.imerominiaDOM.val();
+
+	if (!d)
+	return;
+
+	cdr.dtlockDOM.data('date', d);
+	cdr.dtlockDOM.data('locked', true).addClass('dateLocked').prop('value', 'Unlock');
+};
+
+cdr.dateUnlock = () => {
+	cdr.dtlockDOM.removeData('locked').removeClass('dateLocked').prop('value', 'Lock');
+	return;
+};
 
 cdr.submit = () => {
 	if (cdr.isBusy())
@@ -548,8 +609,11 @@ cdr.busySet = (onOff) => {
 
 <input class="button" id="submit" type="submit" value="Submit">
 <input class="button" id="clear" type="button" value="Clear">
+<div id="dateOps">
 <input class="button" id="simera" type="button" value="Today">
 <input class="button" id="panta" type="button" value="Ever">
+<input class="button" id="dtlock" type="button" value="Lock">
+</div>
 
 <label for="orio" style="font-style: italic;">Limit</label>
 <input id="orio" value="1000" type="number" step="1000" min="1000">

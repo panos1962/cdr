@@ -11,6 +11,7 @@ if (!$_SESSION["dbpass"]) {
 <head>
 <title>CDR-Inquire</title>
 <link rel="icon" type="image/png" href="images/cdr.png">
+
 <style>
 table, th, td {
   border-collapse: collapse;
@@ -492,6 +493,9 @@ cdr.formatData = () => {
 				return 0;
 			});
 
+			// Εκιννούμε την εμφάνιση των αποτελεσμάτων από το
+			// πρώτο στοιχείο του array.
+
 			cdr.formatDataPart(0);
 		}, 0);
 	})).
@@ -501,11 +505,33 @@ cdr.formatData = () => {
 	cdr.formatDataPart(0);
 };
 
+// Η function "formatDataPart" καλείται αμέσως μετά την παραλαβή των
+// αποτελεσμάτων από τον server με σκοπό την εμφάνιση μέρους των αποτελεσμάτων.
+// Δέχεται ως παράμετρο έναν αρχικό index του array αποτελεσμάτων και εμφανίζει
+// τα αποτελέσματα από τον index αυτόν και μετά μέχρι το τέλος του array
+// αποτελεσμάτων. Ωστόσο, μετά την εμφάνιση ικανού πλήθους αποτελεσμάτων,
+// διακόπτει τη λειτουργία της και δρομολογεί (ασύγχρονα) την εμφάνιση των
+// υπολοίπων αποτελεσμάτων προκειμένου ο browser να «πάρει ανάσα» και να
+// ενημερώσει τη σελίδα με το DOM όπως έχει διαμορφωθεί μέχρι στιγμής. Όλα
+// αυτά γίνονται για να έχουμε αξιοπρεπές user experience (UX).
+
 cdr.formatDataPart = (n) => {
-	let i;
-	let count = 0;
-	let orio = (n > 200 ? 1000 : 100)
 	let x = cdr.data;
+	let count = 0;
+	let orio;
+	let i;
+
+	if (n > 200)
+	orio = 500;
+
+	else if (n > 50)
+	orio = 50;
+
+	else if (orio > 10)
+	orio = 10;
+
+	else
+	orio = 1;
 
 	for (i = n; i < x.length; i++) {
 		if (count++ >= orio)
@@ -527,14 +553,24 @@ cdr.formatDataPart = (n) => {
 		append($('<td>').text(cdr.dur2hms(x[i].d))).
 		append($('<td>').text(x[i].h)));
 
+		// Αν έχουμε ξεπεράσει το μέγιστο όριο αναζήτησης, τότε έχουμε
+		// φτάσει στο τέλος των αποτελεσμάτων και διακόπτουμε με
+		// overflow. Πράγματι, ο server επιστρέφει αποτελέσματα μέχρι
+		// του ορίου που έχουμε θέσει αφήνοντας όμως το περιθώριο σε
+		// ένα επιπλέον record προκειμένου να γνωρίζουμε εύκολα και
+		// γρήγορα αν έχουμε περισσότερα αποτελέσματα από το όριο που
+		// έχουμε θέσει.
+
 		if (i >= cdr.orio) {
-			cdr.
-			tbodyDOM.addClass('overflow');
+			cdr.tbodyDOM.addClass('overflow');
 			delete cdr.timer;
 			cdr.busySet(false);
 			return;
 		}
 	}
+
+	// Στο σημείο αυτό ελέγχουμε αν το array αποτελεσμάτων έχει εξαντληθεί,
+	// οπότε διακότπουμε τη διαδικασία εμφάνισης αποτελεσμάτων.
 
 	if (i >= x.length) {
 		cdr.tbodyDOM.addClass('data');
@@ -542,6 +578,9 @@ cdr.formatDataPart = (n) => {
 		cdr.busySet(false);
 		return;
 	}
+
+	// Το array αποτελεσμάτων δεν έχει εξαντληθεί οπότε δρομολογούμε την
+	// εκτύπωση των υπόλοιπων αποτελεσμάτων.
 
 	cdr.timer = setTimeout(() => {
 		cdr.formatDataPart(i);

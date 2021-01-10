@@ -512,7 +512,10 @@ cdr.formatDataPart = (n) => {
 	let orio;
 	let i;
 
-	if (n > 50)
+	if (n > 200)
+	orio = 100;
+
+	else if (n > 50)
 	orio = 50;
 
 	else if (orio > 10)

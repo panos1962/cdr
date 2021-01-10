@@ -556,23 +556,15 @@ cdr.formatDataPart = (n) => {
 		// γρήγορα αν έχουμε περισσότερα αποτελέσματα από το όριο που
 		// έχουμε θέσει.
 
-		if (i >= cdr.orio) {
-			cdr.tbodyDOM.addClass('overflow');
-			cdr.clearTimer();
-			cdr.busySet(false);
-			return;
-		}
+		if (i >= cdr.orio)
+		return cdr.pageReady('overflow');
 	}
 
 	// Στο σημείο αυτό ελέγχουμε αν το array αποτελεσμάτων έχει εξαντληθεί,
 	// οπότε διακότπουμε τη διαδικασία εμφάνισης αποτελεσμάτων.
 
-	if (i >= x.length) {
-		cdr.tbodyDOM.addClass('data');
-		cdr.clearTimer();
-		cdr.busySet(false);
-		return;
-	}
+	if (i >= x.length)
+	return cdr.pageReady('data');
 
 	// Το array αποτελεσμάτων δεν έχει εξαντληθεί οπότε δρομολογούμε την
 	// εκτύπωση των υπόλοιπων αποτελεσμάτων.
@@ -580,6 +572,13 @@ cdr.formatDataPart = (n) => {
 	cdr.timer = setTimeout(() => {
 		cdr.formatDataPart(i);
 	}, 0);
+};
+
+cdr.pageReady = (merosPlires) => {
+	cdr.partCountDOM.empty();
+	cdr.tbodyDOM.addClass(merosPlires);
+	cdr.clearTimer();
+	cdr.busySet(false);
 };
 
 cdr.datetime = (t) => {

@@ -582,7 +582,7 @@ cdr.formatDataPart = (n) => {
 };
 
 cdr.pageReady = (merosPlires) => {
-	//cdr.partCountDOM.empty();
+	cdr.partCountDOM.empty();
 	cdr.tbodyDOM.addClass(merosPlires);
 	cdr.clearTimer();
 	cdr.busySet(false);

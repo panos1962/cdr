@@ -66,8 +66,10 @@ thead {
 #meta {
 	margin-bottom: 2px;
 }
-#total {
+#meta div {
 	display: inline-block;
+}
+#total {
 	margin-right: 8px;
 	font-weight: bold;
 	font-style: normal;
@@ -78,16 +80,10 @@ thead {
 	font-weight: normal;
 	font-style: italic;
 }
-#minDate {
-	display: inline-block;
-}
 #minDate::before {
 	content: '[';
 	margin: 4px 4px;
 	color: gray;
-}
-#maxDate {
-	display: inline-block;
 }
 #maxDate::before {
 	content: '\2013';
@@ -98,6 +94,9 @@ thead {
 	content: ']';
 	margin-left: 4px;
 	color: gray;
+}
+#partCount {
+	margin-left: 8px;
 }
 #dtlock {
 	width: 10ex;
@@ -246,10 +245,8 @@ cdr.submit = () => {
 	return false;
 
 	cdr.busySet(true);
+	cdr.clearTimer();
 
-	if (cdr.timer)
-	clearTimeout(cdr.timer);
-	
 	cdr.dataDOM.empty();
 	cdr.orio = cdr.orioDOM.val();
 
@@ -289,6 +286,14 @@ cdr.submit = () => {
 	});
 
 	return false;
+};
+
+cdr.clearTimer = () => {
+	if (!cdr.timer)
+	return;
+
+	clearTimeout(cdr.timer);
+	delete cdr.timer;
 };
 
 cdr.MIN_DATE = 0;
@@ -333,7 +338,8 @@ cdr.formatData = () => {
 	if ((cdr.minDate !== cdr.MAX_DATE) && (cdr.maxDate !== cdr.MIN_DATE))
 	metaDOM.
 	append($('<div>').attr('id', 'minDate').text(cdr.datetime(cdr.minDate))).
-	append($('<div>').attr('id', 'maxDate').text(cdr.datetime(cdr.maxDate)));
+	append($('<div>').attr('id', 'maxDate').text(cdr.datetime(cdr.maxDate))).
+	append(cdr.partCountDOM = $('<div>').attr('id', 'partCount').text(0));
 
 	cdr.tbodyDOM = $('<tbody>');
 
@@ -347,14 +353,11 @@ cdr.formatData = () => {
 	addClass('sortable').
 	data('order', -1).
 	on('click', function(e) {
-		if (cdr.isBusy())
-		return;
-
-		clearTimeout(cdr.timer);
+		if (cdr.isBusy()) return;
+		cdr.clearTimer();
 		let ord = $(this).data('order');
 		$(this).data('order', ord === 1 ? -1 : 1);
 		cdr.tbodyDOM.empty();
-
 		cdr.timer = setTimeout(() => {
 			cdr.data.sort((a, b) => {
 				if (a.i < b.i)
@@ -372,14 +375,11 @@ cdr.formatData = () => {
 	addClass('sortable').
 	data('order', 1).
 	on('click', function(e) {
-		if (cdr.isBusy())
-		return;
-
-		clearTimeout(cdr.timer);
+		if (cdr.isBusy()) return;
+		cdr.clearTimer();
 		let ord = $(this).data('order');
 		$(this).data('order', ord === 1 ? -1 : 1);
 		cdr.tbodyDOM.empty();
-
 		cdr.timer = setTimeout(() => {
 			cdr.data.sort((a, b) => {
 				if (a.c < b.c)
@@ -403,14 +403,11 @@ cdr.formatData = () => {
 	addClass('sortable').
 	data('order', 1).
 	on('click', function(e) {
-		if (cdr.isBusy())
-		return;
-
-		clearTimeout(cdr.timer);
+		if (cdr.isBusy()) return;
+		cdr.clearTimer();
 		let ord = $(this).data('order');
 		$(this).data('order', ord === 1 ? -1 : 1);
 		cdr.tbodyDOM.empty();
-
 		cdr.timer = setTimeout(() => {
 			cdr.data.sort((a, b) => {
 				if (a.o < b.o)
@@ -434,14 +431,11 @@ cdr.formatData = () => {
 	addClass('sortable').
 	data('order', 1).
 	on('click', function(e) {
-		if (cdr.isBusy())
-		return;
-
-		clearTimeout(cdr.timer);
+		if (cdr.isBusy()) return;
+		cdr.clearTimer();
 		let ord = $(this).data('order');
 		$(this).data('order', ord === 1 ? -1 : 1);
 		cdr.tbodyDOM.empty();
-
 		cdr.timer = setTimeout(() => {
 			cdr.data.sort((a, b) => {
 				if (a.f < b.f)
@@ -468,14 +462,11 @@ cdr.formatData = () => {
 	addClass('sortable').
 	data('order', -1).
 	on('click', function(e) {
-		if (cdr.isBusy())
-		return;
-
-		clearTimeout(cdr.timer);
+		if (cdr.isBusy()) return;
+		cdr.clearTimer();
 		let ord = $(this).data('order');
 		$(this).data('order', ord === 1 ? -1 : 1);
 		cdr.tbodyDOM.empty();
-
 		cdr.timer = setTimeout(() => {
 			cdr.data.sort((a, b) => {
 				if (a.d < b.d)
@@ -493,14 +484,14 @@ cdr.formatData = () => {
 				return 0;
 			});
 
-			// Εκιννούμε την εμφάνιση των αποτελεσμάτων από το
-			// πρώτο στοιχείο του array.
-
 			cdr.formatDataPart(0);
 		}, 0);
 	})).
 	append($('<th>').text('Hunt')))).
 	append(cdr.tbodyDOM));
+
+	// Εκιννούμε την εμφάνιση των αποτελεσμάτων από το
+	// πρώτο στοιχείο του array.
 
 	cdr.formatDataPart(0);
 };
@@ -533,6 +524,7 @@ cdr.formatDataPart = (n) => {
 	else
 	orio = 1;
 
+	cdr.partCountDOM.text(n + 1);
 	for (i = n; i < x.length; i++) {
 		if (count++ >= orio)
 		break;
@@ -563,7 +555,7 @@ cdr.formatDataPart = (n) => {
 
 		if (i >= cdr.orio) {
 			cdr.tbodyDOM.addClass('overflow');
-			delete cdr.timer;
+			cdr.clearTimer();
 			cdr.busySet(false);
 			return;
 		}
@@ -574,7 +566,7 @@ cdr.formatDataPart = (n) => {
 
 	if (i >= x.length) {
 		cdr.tbodyDOM.addClass('data');
-		delete cdr.timer;
+		cdr.clearTimer();
 		cdr.busySet(false);
 		return;
 	}

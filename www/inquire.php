@@ -513,7 +513,10 @@ cdr.formatDataPart = (n) => {
 	let orio;
 	let i;
 
-	if (n > 1000)
+	if (n > 5000)
+	orio = 1000;
+
+	else if (n > 1000)
 	orio = 500;
 
 	else if (n > 200)
@@ -528,7 +531,7 @@ cdr.formatDataPart = (n) => {
 	else
 	orio = 1;
 
-	cdr.partCountDOM.text(n + 1);
+	cdr.partCountDOM.text(n);
 	for (i = n; i < x.length; i++) {
 		if (count++ >= orio)
 		break;

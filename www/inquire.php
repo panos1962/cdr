@@ -97,6 +97,7 @@ thead {
 }
 #partCount {
 	margin-left: 8px;
+	color: midnightblue;
 }
 #dtlock {
 	width: 10ex;

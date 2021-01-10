@@ -531,7 +531,6 @@ cdr.formatDataPart = (n) => {
 	else
 	orio = 1;
 
-	cdr.partCountDOM.text(n);
 	for (i = n; i < x.length; i++) {
 		if (count++ >= orio)
 		break;
@@ -573,6 +572,7 @@ cdr.formatDataPart = (n) => {
 	// Το array αποτελεσμάτων δεν έχει εξαντληθεί οπότε δρομολογούμε την
 	// εκτύπωση των υπόλοιπων αποτελεσμάτων.
 
+	cdr.partCountDOM.text(i);
 	cdr.timer = setTimeout(() => {
 		cdr.formatDataPart(i);
 	}, 0);

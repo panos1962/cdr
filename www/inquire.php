@@ -97,7 +97,10 @@ thead {
 }
 #partCount {
 	margin-left: 8px;
-	color: midnightblue;
+	padding: 0 4px;
+	background-color: midnightblue;
+	color: yellow;
+	border-radius: 4px;
 }
 #dtlock {
 	width: 10ex;
@@ -579,7 +582,7 @@ cdr.formatDataPart = (n) => {
 };
 
 cdr.pageReady = (merosPlires) => {
-	cdr.partCountDOM.empty();
+	//cdr.partCountDOM.empty();
 	cdr.tbodyDOM.addClass(merosPlires);
 	cdr.clearTimer();
 	cdr.busySet(false);

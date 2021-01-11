@@ -558,9 +558,9 @@ cdr.formatDataPart = (n) => {
 
 		cdr.tbodyDOM.append($('<tr>').
 		append($('<td>').addClass('count').text(x[i].i)).
-		append($('<td>').text(x[i].c)).
-		append($('<td>').text(x[i].o)).
-		append($('<td>').text(x[i].f)).
+		append($('<td>').html(cdr.scramble(x[i].c, 6))).
+		append($('<td>').html(cdr.scramble(x[i].o, 6))).
+		append($('<td>').html(cdr.scramble(x[i].f, 6))).
 		append($('<td>').text(origination)).
 		append($('<td>').text(connect)).
 		append($('<td>').text(disconnect)).
@@ -599,6 +599,31 @@ cdr.pageReady = (merosPlires) => {
 	cdr.tbodyDOM.addClass(merosPlires);
 	cdr.clearTimer();
 	cdr.busySet(false);
+};
+
+cdr.scramble = (x, l) => {
+	if (x.length < l)
+	return x;
+
+	if (l < 2)
+	return x;
+
+	let t = x.split('');
+	let s = '';
+	let i = 0;
+
+	for (; i < 2; i++)
+	s += t[i];
+
+	l = x.length - 2;
+
+	for (; i < l; i++)
+	s += '&#x2591;';
+
+	for (; i < x.length; i++)
+	s += t[i];
+
+	return s;
 };
 
 cdr.datetime = (t) => {

@@ -120,6 +120,15 @@ thead {
 #dateOps .button {
 	margin: 4px;
 }
+#spy {
+	margin-left: 10px;
+	opacity: 1;
+	width: 120px;
+}
+.spyHidden {
+	opacity: 0 !important;
+	width: 20px !important;
+}
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
@@ -151,7 +160,6 @@ ready(function() {
 		cdr.dtlockRefresh();
 	});
 	cdr.orioDOM = $('#orio');
-	cdr.submitDOM = $('#submit');
 	cdr.submitDOM = $('#submit');
 
 	$('#simera').
@@ -219,6 +227,15 @@ ready(function() {
 	cdr.dataDOM = $('#data');
 	cdr.formaDOM = $('#forma').
 	on('submit', cdr.submit);
+
+	cdr.spyDOM = $('#spy').
+	on('click', (e) => {
+		if (cdr.spyDOM.hasClass('spyHidden'))
+		cdr.spyDOM.removeClass('spyHidden');
+
+		else
+		cdr.spyDOM.addClass('spyHidden');
+	});
 });
 
 cdr.dateLock = () => {
@@ -247,6 +264,8 @@ cdr.dtlockRefresh = () => {
 cdr.requestId = 0;
 
 cdr.submit = () => {
+	cdr.spyDOM.addClass('spyHidden');
+
 	if (cdr.isBusy())
 	return false;
 
@@ -269,6 +288,7 @@ cdr.submit = () => {
 			"meres": cdr.meresDOM.val(),
 			"orio": cdr.orio,
 			"id": cdr.requestId,
+			"spy": cdr.spyDOM.val(),
 		},
 		"success": (rsp) => {
 			var x;
@@ -292,6 +312,7 @@ cdr.submit = () => {
 				return;
 			}
 
+			cdr.scrambleOff = (x.spy === 1);
 			cdr.data = x.data;
 			cdr.scanfix();
 			cdr.formatData();
@@ -602,6 +623,9 @@ cdr.pageReady = (merosPlires) => {
 };
 
 cdr.scramble = (x, l) => {
+	if (cdr.scrambleOff)
+	return x;
+
 	if (x.length < l)
 	return x;
 
@@ -719,6 +743,7 @@ cdr.busySet = (onOff) => {
 
 <label for="orio" style="font-style: italic;">Limit</label>
 <input id="orio" value="1000" type="number" step="1000" min="1000">
+<input id="spy" type="password" class="spyHidden">
 </form>
 <div id="data">
 </div>

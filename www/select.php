@@ -57,7 +57,14 @@ $res = $db->query($query);
 if (!$res)
 lathos("SQL");
 
-print '{query:"' . $query . '",data:[';
+print '{"dummy":0';
+
+if (spy_check())
+print ',"spy":1';
+
+print ',"query":"' . $query . '"';
+
+print ',"data":[';
 
 $sep = '{';
 while ($row = $res->fetch_row()) {
@@ -75,7 +82,9 @@ while ($row = $res->fetch_row()) {
 	print '}';
 	$sep = ',{';
 }
-print ']}';
+print ']';
+
+print '}';
 
 $res->close();
 $db->close();
@@ -140,5 +149,20 @@ function lathos($msg) {
 	$db->close();
 
 	die('{"error":"' . $msg . '"}');
+}
+
+function spy_check() {
+	if (!array_key_exists("spy", $_POST))
+	return FALSE;
+
+	if (!$_POST["spy"])
+	return FALSE;
+
+	$x = file_get_contents("../local/spy.txt");
+
+	if (sha1($_POST["spy"]) !== file_get_contents("../local/spy.txt"))
+	return FALSE;
+
+	return TRUE;
 }
 ?>

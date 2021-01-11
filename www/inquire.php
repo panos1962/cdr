@@ -622,7 +622,9 @@ cdr.pageReady = (merosPlires) => {
 	cdr.busySet(false);
 };
 
-cdr.scrambleExclude["anonymous"];
+cdr.scrambleExclude = {
+	"anonymous": true,
+};
 
 cdr.scramble = (x, l) => {
 	if (cdr.scrambleOff)

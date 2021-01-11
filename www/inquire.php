@@ -244,6 +244,8 @@ cdr.dtlockRefresh = () => {
 	return;
 };
 
+cdr.requestId = 0;
+
 cdr.submit = () => {
 	if (cdr.isBusy())
 	return false;
@@ -253,6 +255,8 @@ cdr.submit = () => {
 
 	cdr.dataDOM.empty();
 	cdr.orio = cdr.orioDOM.val();
+
+	cdr.requestId++;
 
 	$.post({
 		"url": "select.php",
@@ -264,6 +268,7 @@ cdr.submit = () => {
 			"imerominia": cdr.imerominiaDOM.val(),
 			"meres": cdr.meresDOM.val(),
 			"orio": cdr.orio,
+			"id": cdr.requestId,
 		},
 		"success": (rsp) => {
 			var x;
@@ -276,8 +281,16 @@ cdr.submit = () => {
 				return;
 			}
 
-			if (x.error === 'db')
-			self.location = 'index.php';
+			if (x.error === 'db') {
+				self.location = 'index.php';
+				return;
+			}
+
+			if (x.error) {
+				console.error(x.error);
+				cdr.busySet(false);
+				return;
+			}
 
 			cdr.data = x.data;
 			cdr.scanfix();

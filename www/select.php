@@ -1,6 +1,9 @@
 <?php
 session_start();
 
+if (!array_key_exists("id", $_POST))
+lathos("missing request id");
+
 if (!array_key_exists("dbpass", $_SESSION))
 database_connection_error();
 
@@ -52,7 +55,7 @@ $query .= "LIMIT " . ($_POST["orio"] + 1);
 $res = $db->query($query);
 
 if (!$res)
-lathos("SQL:" . $query);
+lathos("SQL");
 
 print '{query:"' . $query . '",data:[';
 
@@ -115,7 +118,7 @@ function apo_eos() {
 		"DATE_ADD('" . $imerominia . "', INTERVAL 1 DAY), '%Y-%m-%d') ";
 
 	if (!($res = $db->query($query)))
-	lathos($query);
+	lathos("SQL");
 
 	while ($row = $res->fetch_row()) {
 		$apo = $row[0];
@@ -136,6 +139,6 @@ function lathos($msg) {
 	if ($db)
 	$db->close();
 
-	die('{"error":"' . $msg . '}');
+	die('{"error":"' . $msg . '"}');
 }
 ?>

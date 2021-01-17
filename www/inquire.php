@@ -277,6 +277,7 @@ cdr.submit = () => {
 
 	cdr.requestId++;
 
+	console.time('data request');
 	$.post({
 		"url": "select.php",
 		"method": "POST",
@@ -291,6 +292,7 @@ cdr.submit = () => {
 			"spy": cdr.spyDOM.val(),
 		},
 		"success": (rsp) => {
+			console.timeEnd('data request');
 			var x;
 
 			try {
@@ -318,6 +320,7 @@ cdr.submit = () => {
 			cdr.formatData();
 		},
 		"error": (err) => {
+			console.timeEnd('data request');
 			cdr.busySet(false);
 			console.error(err);
 		},
@@ -545,6 +548,9 @@ cdr.formatData = () => {
 // αυτά γίνονται για να έχουμε αξιοπρεπές user experience (UX).
 
 cdr.formatDataPart = (n) => {
+	if (n === 0)
+	console.time('format data');
+
 	let x = cdr.data;
 	let count = 0;
 	let orio;
@@ -616,6 +622,7 @@ cdr.formatDataPart = (n) => {
 };
 
 cdr.pageReady = (merosPlires) => {
+	console.timeEnd('format data');
 	cdr.partCountDOM.empty();
 	cdr.tbodyDOM.addClass(merosPlires);
 	cdr.clearTimer();
